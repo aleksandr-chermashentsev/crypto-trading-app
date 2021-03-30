@@ -1,0 +1,6 @@
+applicationType: grpc
+defaultPackage: ru.avca
+testFramework: junit
+sourceLanguage: java
+buildTool: gradle
+features: [ annotation-api, app-name, github-workflow-docker-registry, gradle, grpc, java, java-application, jib, junit, kubernetes, log4j2, management, netflix-hystrix, readme, shade, yaml ]
