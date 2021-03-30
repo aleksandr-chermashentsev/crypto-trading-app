@@ -1,0 +1,4 @@
+micronaut:
+  application:
+    name: robotImpl
+hystrix.stream.enabled: false
