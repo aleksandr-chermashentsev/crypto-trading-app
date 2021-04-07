@@ -10,26 +10,38 @@ import lombok.Value;
  **/
 public class CandlestickEvents {
     @Value
+    public static class ListenerKey {
+        String symbols;
+        CandlestickInterval interval;
+    }
+    @Value
     public static class BinanceCandlestickEvent {
         CandlestickEvent binanceEvent;
+        ListenerKey key;
     }
 
     @Value
     public static class StartListenCandlesticksEvent {
-        String symbol;
-        CandlestickInterval interval;
+        ListenerKey key;
     }
 
     @Value
     public static class StopListenCandlesticksEvent {
-        String symbol;
-        CandlestickInterval interval;
+        ListenerKey key;
     }
 
     @Value
     public static class RestartListenCandlesticksEvent {
-        String symbol;
-        CandlestickInterval interval;
+        ListenerKey key;
     }
 
+    @Value
+    public static class ListenerHasStartedListenToCandlestickEvent {
+        ListenerKey key;
+    }
+
+    @Value
+    public static class ListenerHasStoppedListenToCandlestickEvent {
+        ListenerKey key;
+    }
 }

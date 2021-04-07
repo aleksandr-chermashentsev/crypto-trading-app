@@ -3,12 +3,12 @@ package ru.avca.robot;
 import com.binance.api.client.BinanceApiCallback;
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.domain.event.CandlestickEvent;
-import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.avca.robot.event.CandlestickEvents;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,34 +27,35 @@ import static ru.avca.robot.event.CandlestickEvents.*;
 @Singleton
 public class CandlestickListener {
     private static final Logger LOG = LoggerFactory.getLogger(CandlestickListener.class);
+    private final Object monitorObj = new Object();
 
     @Inject
     private ApplicationEventPublisher eventPublisher;
     @Inject
     private BinanceApiClientFactory clientFactory;
-    private final ConcurrentMap<StartedListenerKey, Boolean> startedListeners = new ConcurrentHashMap<>();
-    private final ConcurrentMap<StartedListenerKey, CountDownLatch> latches = new ConcurrentHashMap<>();
+    private final ConcurrentMap<ListenerKey, Boolean> startedListeners = new ConcurrentHashMap<>();
+    private final ConcurrentMap<ListenerKey, CountDownLatch> latches = new ConcurrentHashMap<>();
 
     @Async
     @EventListener
     void onStartListenEvent(StartListenCandlesticksEvent event) {
-        startListenToCandlestick(event.getSymbol(), event.getInterval());
+        ListenerKey key = event.getKey();
+        startListenToCandlestick(key);
     }
 
     @Async
     @EventListener
     void onStopListenEvent(StopListenCandlesticksEvent event) {
-        stopListenToCandlestick(event.getSymbol(), event.getInterval());
+        stopListenToCandlestick(event.getKey());
     }
 
     @Async
     @EventListener
     void onRestartEvent(RestartListenCandlesticksEvent event) {
-        restartListener(event.getSymbol(), event.getInterval());
+        restartListener(event.getKey());
     }
 
-    private void stopListenToCandlestick(String symbol, CandlestickInterval interval) {
-        StartedListenerKey key = new StartedListenerKey(symbol, interval);
+    private void stopListenToCandlestick(ListenerKey key) {
         startedListeners.remove(key);
 
         CountDownLatch countDownLatch = latches.get(key);
@@ -64,23 +65,27 @@ public class CandlestickListener {
         LOG.info("Got stop listen event");
     }
 
-    private void restartListener(String symbol, CandlestickInterval interval) {
-        StartedListenerKey key = new StartedListenerKey(symbol, interval);
-
+    private void restartListener(ListenerKey key) {
         CountDownLatch countDownLatch = latches.get(key);
         countDownLatch.countDown();
     }
 
-    private void startListenToCandlestick(String symbol, CandlestickInterval interval) {
-        StartedListenerKey key = new StartedListenerKey(symbol, interval);
+    private void startListenToCandlestick(ListenerKey key) {
 
-        startedListeners.put(key, true);
+        synchronized (monitorObj) {
+            Boolean isStarted = startedListeners.getOrDefault(key, false);
+            if (isStarted) {
+                LOG.info("Listener is already started for key {}. Ignore start event", key);
+                return;
+            }
+            startedListeners.put(key, true);
+        }
 
         while (startedListeners.getOrDefault(key, false)) {
             CountDownLatch latch = new CountDownLatch(1);
             latches.put(key, latch);
             LOG.info("subscribe on candlestick events");
-            Closeable connectionWebSocket = clientFactory.newWebSocketClient().onCandlestickEvent(symbol, interval, new BinanceApiCallback<>() {
+            Closeable connectionWebSocket = clientFactory.newWebSocketClient().onCandlestickEvent(key.getSymbols(), key.getInterval(), new BinanceApiCallback<>() {
                 @Override
                 public void onFailure(Throwable cause) {
                     latch.countDown();
@@ -89,25 +94,22 @@ public class CandlestickListener {
 
                 @Override
                 public void onResponse(CandlestickEvent event) {
-                    LOG.debug("Got new event {} ", event);
-                    eventPublisher.publishEventAsync(new BinanceCandlestickEvent(event));
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Got new event {} ", event);
+                    }
+                    eventPublisher.publishEventAsync(new BinanceCandlestickEvent(event, key));
                 }
             });
 
             try {
+                eventPublisher.publishEvent(new CandlestickEvents.ListenerHasStartedListenToCandlestickEvent(key));
                 //This latch can be unlocked by stop event, failure or if too much time passed without updates
                 latch.await();
                 connectionWebSocket.close();
+                eventPublisher.publishEvent(new ListenerHasStoppedListenToCandlestickEvent(key));
             } catch (InterruptedException | IOException e) {
                 LOG.error("Exception on latch ", e);
             }
         }
     }
-
-    @lombok.Value
-    private static class StartedListenerKey {
-        String symbol;
-        CandlestickInterval interval;
-    }
-
 }

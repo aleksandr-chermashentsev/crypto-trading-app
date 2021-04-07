@@ -23,6 +23,18 @@ public class MessageListenerTestHelper {
         queue.add(event);
     }
 
+    @Async
+    @EventListener
+    public void onEvent(CandlestickEvents.RestartListenCandlesticksEvent event) {
+        queue.add(event);
+    }
+
+    @Async
+    @EventListener
+    public void onEvent(CandlestickEvents.StartListenCandlesticksEvent event) {
+        queue.add(event);
+    }
+
     public Queue getQueue() {
         return queue;
     }

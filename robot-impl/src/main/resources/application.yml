@@ -2,3 +2,8 @@ micronaut:
   application:
     name: robotImpl
 hystrix.stream.enabled: false
+
+robot:
+  candlestickListener:
+      possible_gap_in_updates_ms: 60_000
+      check_time_period_multiplier: 10
