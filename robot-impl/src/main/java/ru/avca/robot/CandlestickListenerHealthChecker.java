@@ -33,6 +33,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static ru.avca.robot.utils.TimeUtils.getCurrentTimeUtc;
+
 /**
  * @author a.chermashentsev
  * Date: 01.04.2021
@@ -40,9 +42,9 @@ import java.util.stream.Collectors;
 @Context
 public class CandlestickListenerHealthChecker {
     private static final Logger LOG = LoggerFactory.getLogger(CandlestickListenerHealthChecker.class);
-    @Value("${robot.candlestickListener.possible_gap_in_updates_ms:60000}")
+    @Value("${candlestickListener.possible_gap_in_updates_ms:60000}")
     private int possibleGapInUpdatesMs;
-    @Value("${robot.candlestickListener.check_time_period_multiplier:10}")
+    @Value("${candlestickListener.check_time_period_multiplier:10}")
     private int checkTimePeriodMultiplier;
     @Inject
     private ApplicationEventPublisher eventPublisher;
@@ -107,10 +109,5 @@ public class CandlestickListenerHealthChecker {
             }
         });
     }
-
-    private long getCurrentTimeUtc() {
-        return ZonedDateTime.now().toInstant().toEpochMilli();
-    }
-
 
 }

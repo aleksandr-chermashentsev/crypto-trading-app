@@ -35,8 +35,8 @@ class CandlestickListenerHealthCheckerTest {
     @Test
     public void shouldSendRestartWhenDoesntGetUpdatesForLongTime() throws InterruptedException {
         Map<String, Object> values = new HashMap<>();
-        values.put("robot.candlestickListener.possible_gap_in_updates_ms", 1);
-        values.put("robot.candlestickListener.check_time_period_multiplier", 1);
+        values.put("candlestickListener.possible_gap_in_updates_ms", 1);
+        values.put("candlestickListener.check_time_period_multiplier", 1);
         values.put("test.send_binance_events", false);
         values.put("test.send_exception", false);
         ApplicationContext context = ApplicationContext.run(ApplicationContext.class, values);
@@ -52,14 +52,13 @@ class CandlestickListenerHealthCheckerTest {
 
         assertNotNull(restartEvent);
         assertEquals(CandlestickEvents.RestartListenCandlesticksEvent.class, restartEvent.getClass());
-
     }
 
     @Test
     public void shouldNotSendRestartWhenGetUpdatesPeriodically() throws InterruptedException {
         Map<String, Object> values = new HashMap<>();
-        values.put("robot.candlestickListener.possible_gap_in_updates_ms", 30);
-        values.put("robot.candlestickListener.check_time_period_multiplier", 5);
+        values.put("candlestickListener.possible_gap_in_updates_ms", 30);
+        values.put("candlestickListener.check_time_period_multiplier", 5);
         values.put("test.send_binance_events", true);
         values.put("test.send_binance_events_interval_ms", 1);
         ApplicationContext context = ApplicationContext.run(ApplicationContext.class, values);
@@ -79,8 +78,8 @@ class CandlestickListenerHealthCheckerTest {
     @Test
     public void shouldNotSendRestartWhenListenerStopped() throws InterruptedException {
         Map<String, Object> values = new HashMap<>();
-        values.put("robot.candlestickListener.possible_gap_in_updates_ms", 30);
-        values.put("robot.candlestickListener.check_time_period_multiplier", 1);
+        values.put("candlestickListener.possible_gap_in_updates_ms", 30);
+        values.put("candlestickListener.check_time_period_multiplier", 1);
         values.put("test.send_binance_events", true);
         values.put("test.send_binance_events_interval_ms", 5);
         ApplicationContext context = ApplicationContext.run(ApplicationContext.class, values);

@@ -9,6 +9,7 @@ import lombok.Value;
  * Date: 01.04.2021
  **/
 public class CandlestickEvents {
+    private CandlestickEvents(){}
     @Value
     public static class ListenerKey {
         String symbols;

@@ -4,10 +4,12 @@ import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
 import ru.avca.robot.event.CandlestickEvents;
+import ru.avca.robot.event.RobotEvents;
 
 import javax.inject.Singleton;
+import java.util.Optional;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 
 /**
  * @author a.chermashentsev
@@ -19,23 +21,24 @@ public class MessageListenerTestHelper {
 
     @Async
     @EventListener
-    public void onEvent(CandlestickEvents.BinanceCandlestickEvent event) {
-        queue.add(event);
-    }
-
-    @Async
-    @EventListener
-    public void onEvent(CandlestickEvents.RestartListenCandlesticksEvent event) {
-        queue.add(event);
-    }
-
-    @Async
-    @EventListener
-    public void onEvent(CandlestickEvents.StartListenCandlesticksEvent event) {
+    public void onEvent(Object event) {
         queue.add(event);
     }
 
     public Queue getQueue() {
         return queue;
+    }
+
+    public <T> Future<T> getEventFromQueue(Class<T> eventClass) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            Optional eventOpt = queue.stream()
+                    .filter(eventClass::isInstance)
+                    .findAny();
+            if (eventOpt.isPresent()) {
+                future.complete((T) eventOpt.get());
+            }
+        }, 100, 100, TimeUnit.MILLISECONDS);
+        return future;
     }
 }

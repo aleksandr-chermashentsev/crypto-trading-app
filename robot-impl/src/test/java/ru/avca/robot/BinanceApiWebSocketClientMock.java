@@ -4,7 +4,6 @@ import com.binance.api.client.BinanceApiCallback;
 import com.binance.api.client.BinanceApiWebSocketClient;
 import com.binance.api.client.domain.event.*;
 import com.binance.api.client.domain.market.CandlestickInterval;
-import lombok.SneakyThrows;
 
 import java.io.Closeable;
 import java.util.List;
