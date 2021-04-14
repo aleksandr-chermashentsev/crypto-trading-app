@@ -115,6 +115,9 @@ public class BestCoinStrategyRobot {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Robot got binance candlestick event {}", event);
         }
+        if (startEvent == null) {
+            return;
+        }
         if (event.getKey().getInterval() == startEvent.getInterval() && alreadySubscribedSymbols.containsKey(event.getBinanceEvent().getSymbol())) {
             candles.put(event.getBinanceEvent().getSymbol(), event.getBinanceEvent());
             if (!currentOpenPositionPrice.isEmpty()) {

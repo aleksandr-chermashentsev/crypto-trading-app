@@ -10,6 +10,7 @@ import io.micronaut.inject.qualifiers.Qualifiers;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.InjectMocks;
 import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.factory.BinanceFactory;
@@ -21,6 +22,9 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,11 +33,13 @@ import static org.mockito.Mockito.*;
  * @author a.chermashentsev
  * Date: 06.04.2021
  **/
+@MicronautTest
+@Timeout(3)
 class CandlestickListenerHealthCheckerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.ONE_MINUTE);
 
     @Test
-    public void shouldSendRestartWhenDoesntGetUpdatesForLongTime() throws InterruptedException {
+    public void shouldSendRestartWhenDoesntGetUpdatesForLongTime() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("candlestickListener.possible_gap_in_updates_ms", 1);
         values.put("candlestickListener.check_time_period_multiplier", 1);
@@ -45,13 +51,13 @@ class CandlestickListenerHealthCheckerTest {
 
         eventPublisher.publishEvent(new CandlestickEvents.StartListenCandlesticksEvent(key));
 
-        Thread.sleep(100);
+        Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
 
-        messageListenerTestHelper.getQueue().poll();
-        Object restartEvent = messageListenerTestHelper.getQueue().poll();
+        assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent must present");
 
-        assertNotNull(restartEvent);
-        assertEquals(CandlestickEvents.RestartListenCandlesticksEvent.class, restartEvent.getClass());
+        Future<CandlestickEvents.RestartListenCandlesticksEvent> restartEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.RestartListenCandlesticksEvent.class);
+
+        assertNotNull(restartEventFuture.get(), "RestartListenCandlesticksEvent must present");
     }
 
     @Test
@@ -67,12 +73,13 @@ class CandlestickListenerHealthCheckerTest {
 
         eventPublisher.publishEvent(new CandlestickEvents.StartListenCandlesticksEvent(key));
 
-        Thread.sleep(100);
+        try {
+            Future<CandlestickEvents.RestartListenCandlesticksEvent> restartEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.RestartListenCandlesticksEvent.class);
+            CandlestickEvents.RestartListenCandlesticksEvent restartEvent = restartEventFuture.get(1, TimeUnit.SECONDS);
+            fail("There is should be no restart event but got one " + restartEvent);
+        } catch (Exception e) {
 
-        boolean hasRestartEvent = messageListenerTestHelper.getQueue().stream()
-                .anyMatch(CandlestickEvents.RestartListenCandlesticksEvent.class::isInstance);
-        assertFalse(hasRestartEvent, "Should not have restart event");
-
+        }
     }
 
     @Test
@@ -90,11 +97,12 @@ class CandlestickListenerHealthCheckerTest {
         Thread.sleep(20);
         eventPublisher.publishEvent(new CandlestickEvents.StopListenCandlesticksEvent(key));
 
-        Thread.sleep(100);
+        try {
+            Future<CandlestickEvents.RestartListenCandlesticksEvent> restartEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.RestartListenCandlesticksEvent.class);
+            CandlestickEvents.RestartListenCandlesticksEvent restartEvent = restartEventFuture.get(1, TimeUnit.SECONDS);
+            fail("There is should be no restart event but got one " + restartEvent);
+        } catch (Exception e) {
 
-        boolean hasRestartEvent = messageListenerTestHelper.getQueue().stream()
-                .anyMatch(CandlestickEvents.RestartListenCandlesticksEvent.class::isInstance);
-        assertFalse(hasRestartEvent, "Should not have restart event");
-
+        }
     }
 }

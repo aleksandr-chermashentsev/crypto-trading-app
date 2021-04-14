@@ -22,11 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -34,12 +35,12 @@ import static org.mockito.Mockito.*;
  * Date: 01.04.2021
  **/
 @MicronautTest
+@Timeout(value = 3)
 public class CandlestickListenerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.THREE_DAILY);
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    public void shouldSendCandlesticksWhenGotStartEvent() throws InterruptedException {
+    public void shouldSendCandlesticksWhenGotStartEvent() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.send_binance_events", true);
         values.put("test.send_binance_events_interval_ms", 20);
@@ -49,21 +50,16 @@ public class CandlestickListenerTest {
         Queue queue = messageListener.getQueue();
         //when
         eventPublisher.publishEvent(new CandlestickEvents.StartListenCandlesticksEvent(key));
-        boolean hasCandlestickEvents = false;
 
         //wait for event or fail by timeout
-        while (!hasCandlestickEvents) {
-            Thread.sleep(10);
-            hasCandlestickEvents = queue.stream()
-                    .anyMatch(CandlestickEvents.BinanceCandlestickEvent.class::isInstance);
-        }
+        Future<CandlestickEvents.BinanceCandlestickEvent> eventFuture = messageListener.getEventFromQueue(CandlestickEvents.BinanceCandlestickEvent.class);
+        assertNotNull(eventFuture.get(), "BinanceCandlestickEvent must preset");
 
         context.close();
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    public void shouldStopWhenGotStopEvent() throws InterruptedException {
+    public void shouldStopWhenGotStopEvent() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.send_binance_events", true);
         values.put("test.send_binance_events_interval_ms", 20);
@@ -75,22 +71,20 @@ public class CandlestickListenerTest {
         boolean hasCandlestickEvents = false;
 
         //wait for event or fail by timeout
-        while (!hasCandlestickEvents) {
-            Thread.sleep(10);
-            hasCandlestickEvents = queue.stream()
-                    .anyMatch(CandlestickEvents.BinanceCandlestickEvent.class::isInstance);
-        }
+        Future<CandlestickEvents.BinanceCandlestickEvent> eventFuture = messageListener.getEventFromQueue(CandlestickEvents.BinanceCandlestickEvent.class);
+        assertNotNull(eventFuture.get(), "BinanceCandlestickEvent must preset");
 
         //when
         eventPublisher.publishEvent(new CandlestickEvents.StopListenCandlesticksEvent(key));
-        //fix queue size right after publish stop event
-        int queueSize = queue.size();
-        Thread.sleep(50);
+        queue.clear();
 
-        //then
+        eventFuture = messageListener.getEventFromQueue(CandlestickEvents.BinanceCandlestickEvent.class);
+        try {
+            eventFuture.get(1, TimeUnit.SECONDS);
+            fail("There is should be no more BinanceCandlestickEvent but got one" + eventFuture.get());
+        } catch (Exception e) {
 
-        //queue size shouldn't change after stop listen event
-        assertEquals(queueSize, queue.size());
+        }
 
         context.close();
     }
