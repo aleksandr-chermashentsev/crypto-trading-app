@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: "robot-impl"
-          image: "gcr.io/robot-impl/jib-image"
+          image: "hehehuhu/acherm-repo:robot-impl"
           ports:
             - name: http
               containerPort: 8080
@@ -30,15 +30,3 @@ spec:
             initialDelaySeconds: 5
             timeoutSeconds: 3
             failureThreshold: 10
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: "robot-impl"
-spec:
-  selector:
-    app: "robot-impl"
-  type: LoadBalancer
-  ports:
-    - protocol: "TCP"
-      port: 8080
