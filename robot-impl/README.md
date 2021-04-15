@@ -9,7 +9,7 @@
 
 ## Push To Docker Registry Workflow
 
-Workflow file: [`.github/workflows/gradle.yml`](.github/workflows/gradle.yml)
+Workflow file: [`.github/workflows/gradle.yml`](../.github/workflows/gradle.yml)
 
 ### Workflow description
 
