@@ -30,4 +30,5 @@ jobs:
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
           cd robot-impl
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           ./gradlew check dockerPush --no-daemon
