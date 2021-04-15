@@ -1,40 +1,33 @@
 package ru.avca.robot;
 
-import com.binance.api.client.BinanceApiCallback;
 import com.binance.api.client.BinanceApiClientFactory;
-import com.binance.api.client.BinanceApiWebSocketClient;
-import com.binance.api.client.domain.event.*;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import ru.avca.robot.event.CandlestickEvents;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.Closeable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author a.chermashentsev
  * Date: 01.04.2021
  **/
 @MicronautTest
+@Disabled
 @Timeout(value = 3)
 public class CandlestickListenerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.THREE_DAILY);
@@ -80,7 +73,7 @@ public class CandlestickListenerTest {
 
         eventFuture = messageListener.getEventFromQueue(CandlestickEvents.BinanceCandlestickEvent.class);
         try {
-            eventFuture.get(1, TimeUnit.SECONDS);
+            eventFuture.get(2, TimeUnit.SECONDS);
             fail("There is should be no more BinanceCandlestickEvent but got one" + eventFuture.get());
         } catch (Exception e) {
 
