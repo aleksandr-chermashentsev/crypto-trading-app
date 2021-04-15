@@ -30,6 +30,6 @@ jobs:
           DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY_URL }}
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
-          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_USERNAME}/${DOCKER_REPOSITORY_PATH}/robot-impl"
+          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/robot-impl" | sed -e 's#//#/#' -e 's#^/##'`
           cd robot-impl
           ./gradlew check dockerPush --no-daemon
