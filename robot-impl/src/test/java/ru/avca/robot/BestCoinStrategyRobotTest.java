@@ -5,7 +5,6 @@ import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import ru.avca.robot.event.CandlestickEvents;
@@ -15,7 +14,10 @@ import ru.avca.robot.utils.TimeUtils;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Date: 12.04.2021
  **/
 @MicronautTest
-@Disabled
 @Timeout(3)
 class BestCoinStrategyRobotTest {
 
@@ -43,7 +44,7 @@ class BestCoinStrategyRobotTest {
 
         assertEquals("btc-usdt,eth-usdt,xrp-usdt,tbd-usdt", future.get().getKey().getSymbols());
     }
-    @Disabled
+
     @Test
     public void shouldSaveCandlesDataOnlyForHisSubscriptions() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();

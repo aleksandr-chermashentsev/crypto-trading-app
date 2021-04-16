@@ -79,3 +79,7 @@ protobuf {
         all()*.plugins { grpc {} }
     }
 }
+
+tasks.withType(Test)  {
+    maxParallelForks = 1
+}

@@ -5,7 +5,6 @@ import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import ru.avca.robot.event.CandlestickEvents;
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.verify;
  * Date: 01.04.2021
  **/
 @MicronautTest
-@Disabled
 @Timeout(value = 3)
 public class CandlestickListenerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.THREE_DAILY);
