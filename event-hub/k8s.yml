@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "event-hub"
+spec:
+  selector:
+    matchLabels:
+      app: "event-hub"
+  template:
+    metadata:
+      labels:
+        app: "event-hub"
+    spec:
+      containers:
+        - name: "event-hub"
+          image: "gcr.io/event-hub/jib-image"
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "event-hub"
+spec:
+  selector:
+    app: "event-hub"
+  type: LoadBalancer
+  ports:
+    - protocol: "TCP"
+      port: 8080
