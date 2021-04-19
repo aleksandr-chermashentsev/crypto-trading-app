@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "event_hub";
+option java_outer_classname = "EventHubProto";
+option objc_class_prefix = "EHP";
+
+package event_hub;
+
+service EventHub {
+  rpc Register (RegisterRequest) returns (RegisterResponse) {}
+}
+
+enum EventType {
+  UNKNOWN = 0;
+  ROBOT_START = 1;
+}
+message RegisterRequest {
+  repeated EventType types = 1;
+}
+
+message RegisterResponse {
+  bool isRegistered = 1;
+}

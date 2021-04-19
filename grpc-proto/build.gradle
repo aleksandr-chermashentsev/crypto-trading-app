@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("com.google.protobuf") version "0.8.13"
+}
+
+version = "0.1"
+group = "ru.avca"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('io.grpc:grpc-protobuf-lite:1.27.1') {
+        exclude module: "protobuf-lite"
+    }
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'io.grpc:grpc-stub:1.27.0'
+    implementation 'com.google.protobuf:protobuf-java:3.8.0'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs("build/generated/source/proto/main/grpc")
+            srcDirs("build/generated/source/proto/main/java")
+        }
+    }
+}
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:3.8.0" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.33.1" }
+        grpckt { artifact = "io.grpc:protoc-gen-grpc-kotlin:0.1.22" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {
+            option 'lite'
+        } }
+    }
+}

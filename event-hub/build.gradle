@@ -4,7 +4,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
     id("io.micronaut.application") version "1.4.2"
-    id("com.google.protobuf") version "0.8.13"
     id("com.google.cloud.tools.jib") version "2.6.0"
 }
 
@@ -37,6 +36,7 @@ dependencies {
     implementation("io.micronaut:micronaut-validation")
     implementation("io.micronaut.kotlin:micronaut-kotlin-extension-functions")
     implementation("com.google.protobuf:protobuf-lite:3.0.0")
+    implementation project(":grpc-proto")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 }
@@ -59,27 +59,6 @@ dockerBuildNative {
     images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version"]
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs("build/generated/source/proto/main/grpc")
-            srcDirs("build/generated/source/proto/main/grpckt")
-            srcDirs("build/generated/source/proto/main/java")
-        }
-    }
-}
-
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:3.14.0" }
-    plugins {
-        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.33.1" }
-        grpckt { artifact = "io.grpc:protoc-gen-grpc-kotlin:0.1.22" }
-    }
-    generateProtoTasks {
-        all()*.plugins { grpc {} }
-    }
-}
-
 tasks {
     compileKotlin {
         kotlinOptions {
@@ -97,7 +76,4 @@ tasks {
             image = "gcr.io/myapp/jib-image"
         }
     }
-}
-tasks.withType(Test)  {
-    maxParallelForks = 1
 }
