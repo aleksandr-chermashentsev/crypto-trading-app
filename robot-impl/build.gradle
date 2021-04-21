@@ -1,9 +1,8 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.4.2"
-    id("com.google.protobuf") version "0.8.13"
     id("com.google.cloud.tools.jib") version "2.6.0"
     id("io.freefair.lombok") version "5.3.0"
+    id("io.micronaut.application") version "1.4.2"
 }
 
 version = "0.1"
@@ -26,7 +25,7 @@ micronaut {
 dependencies {
     implementation("io.micronaut:micronaut-management")
     implementation("io.micronaut:micronaut-runtime")
-    implementation("io.micronaut.grpc:micronaut-grpc-runtime")
+    implementation("io.micronaut.grpc:micronaut-grpc-client-runtime")
     implementation("io.micronaut.netflix:micronaut-netflix-hystrix")
     implementation("javax.annotation:javax.annotation-api")
     implementation("org.apache.logging.log4j:log4j-core:2.13.2")
@@ -34,6 +33,7 @@ dependencies {
     runtimeOnly("org.apache.logging.log4j:log4j-api:2.13.2")
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.13.2")
     implementation("io.micronaut:micronaut-validation")
+    implementation(project(":grpc-proto"))
     testImplementation("io.micronaut:micronaut-http-client")
     testImplementation("org.mockito:mockito-core:2.1.0")
 }
@@ -59,24 +59,6 @@ dockerBuildNative {
 jib {
     to {
         image = "gcr.io/myapp/jib-image"
-    }
-}
-sourceSets {
-    main {
-        java {
-            srcDirs("build/generated/source/proto/main/grpc")
-            srcDirs("build/generated/source/proto/main/java")
-        }
-    }
-}
-
-protobuf {
-    protoc { artifact = "com.google.protobuf:protoc:3.14.0" }
-    plugins {
-        grpc { artifact = "io.grpc:protoc-gen-grpc-java:1.33.1" }
-    }
-    generateProtoTasks {
-        all()*.plugins { grpc {} }
     }
 }
 

@@ -6,6 +6,10 @@ hystrix.stream.enabled: false
 candlestickListener:
   possible_gap_in_updates_ms: 60_000
   check_time_period_multiplier: 10
+grpc:
+  client:
+    plaintext: true
+
 robot:
   usdCoin: USDT
   interval: TWELVE_HOURLY

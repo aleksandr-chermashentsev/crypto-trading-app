@@ -4,17 +4,14 @@ import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.annotation.Value;
 import io.micronaut.context.env.Environment;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.context.event.StartupEvent;
-import io.micronaut.discovery.event.ServiceReadyEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.robot.config.RobotConfig;
-import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.event.RobotEvents;
 import ru.avca.robot.utils.TimeUtils;
 
@@ -22,10 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.*;
-import static java.util.concurrent.TimeUnit.DAYS;
 
 /**
  * @author a.chermashentsev
@@ -37,8 +32,8 @@ public class Runner {
     private static final Logger LOG = LoggerFactory.getLogger(Runner.class);
 
     @Inject private ApplicationEventPublisher eventPublisher;
-    @Inject RobotConfig robotConfig;
-    @Inject BinanceApiClientFactory clientFactory;
+    @Inject private RobotConfig robotConfig;
+    @Inject private BinanceApiClientFactory clientFactory;
 
     @EventListener
     @Async
@@ -83,7 +78,6 @@ public class Runner {
             case THREE_DAILY -> DAYS.toMillis(3);
             case WEEKLY -> DAYS.toMillis(7);
             case MONTHLY -> DAYS.toMillis(30);
-            default -> throw new RuntimeException("Unknown interval " + interval);
         };
     }
 }

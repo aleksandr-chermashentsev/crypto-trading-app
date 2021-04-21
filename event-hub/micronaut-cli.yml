@@ -3,4 +3,4 @@ defaultPackage: com.example
 testFramework: kotest
 sourceLanguage: kotlin
 buildTool: gradle_kotlin
-features: [ annotation-api, app-name, github-workflow-docker-registry, gradle, http-client, jib, kotest, kotlin, kotlin-application, kotlin-extension-functions, kubernetes, logback, management, netty-server, readme, shade, yaml ]
+features: [ annotation-api, app-name, github-workflow-docker-registry, gradle, http-client, jib, kotest, kotlin, kotlin-application, kotlin-extension-functions, kubernetes, logback, management, netty-server, readme, shade, yaml, grpc ]

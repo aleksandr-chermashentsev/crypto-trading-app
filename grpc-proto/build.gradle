@@ -28,6 +28,9 @@ sourceSets {
         }
     }
 }
+shadowJar {
+    exclude '**/Server.class'
+}
 protobuf {
     protoc { artifact = "com.google.protobuf:protoc:3.8.0" }
     plugins {

@@ -10,6 +10,6 @@ import io.micronaut.runtime.Micronaut
 fun main(args: Array<String>) {
     Micronaut.build()
             .args(*args)
-            .packages("ru.avca")
+            .packages("ru.avca.*")
             .start()
 }

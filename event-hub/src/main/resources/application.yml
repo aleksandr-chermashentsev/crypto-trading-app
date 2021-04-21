@@ -1,3 +1,8 @@
 micronaut:
   application:
     name: eventHub
+grpc:
+  server:
+    port: 50051
+    keep-alive-time: 3h
+    max-inbound-message-size: 1024
