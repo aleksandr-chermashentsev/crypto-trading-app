@@ -1,14 +1,25 @@
 micronaut:
   application:
-    name: robotImpl
+    name: robot-impl
 hystrix.stream.enabled: false
 
+consul:
+  client:
+    registration:
+      enabled: true
+    defaultZone: "${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}"
 candlestickListener:
   possible_gap_in_updates_ms: 60_000
   check_time_period_multiplier: 10
 grpc:
   client:
     plaintext: true
+    discovery:
+      enabled: true
+  server:
+    port: 50052
+    keep-alive-time: 3h
+    max-inbound-message-size: 1024
 
 robot:
   usdCoin: USDT

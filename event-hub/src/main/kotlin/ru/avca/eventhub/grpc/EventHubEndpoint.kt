@@ -15,9 +15,9 @@ import javax.inject.Singleton
 class EventHubEndpoint : EventHubGrpc.EventHubImplBase() {
 
     override fun register(request: RegisterRequest?, responseObserver: StreamObserver<RegisterResponse>?) {
-        val typesList = request?.typesList
-        typesList?.forEach { type -> println(type) }
-        responseObserver?.onNext(RegisterResponse.newBuilder().setIsRegistered(true).build())
-        responseObserver?.onCompleted()
+        request?.typesList?.stream()?.let {
+            responseObserver?.onNext(RegisterResponse.newBuilder().setIsRegistered(true).build())
+            responseObserver?.onCompleted()
+        }
     }
 }

@@ -9,6 +9,8 @@ import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.concurrent.ExecutionException;
@@ -19,6 +21,7 @@ import java.util.concurrent.ExecutionException;
  **/
 @Context
 public class EventHubClient {
+    private static final Logger LOG = LoggerFactory.getLogger(EventHubClient.class);
     @Inject private EventHubGrpc.EventHubFutureStub stub;
 
     @EventListener
@@ -28,7 +31,8 @@ public class EventHubClient {
                 .addTypes(EventType.ROBOT_START)
                 .build()
         );
-        System.out.println(register.get());
+        RegisterResponse response = register.get();
+        LOG.info("Got response {}", response);
     }
 
 }

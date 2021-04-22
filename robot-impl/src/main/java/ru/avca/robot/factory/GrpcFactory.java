@@ -14,7 +14,7 @@ import io.micronaut.grpc.annotation.GrpcChannel;
 public class GrpcFactory {
     @Bean
     EventHubGrpc.EventHubFutureStub futureStub(
-            @GrpcChannel("http://localhost:50051") ManagedChannel channel
+            @GrpcChannel("event-hub") ManagedChannel channel
     ) {
         return EventHubGrpc.newFutureStub(channel);
     }
