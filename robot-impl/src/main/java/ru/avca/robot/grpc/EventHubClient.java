@@ -2,9 +2,8 @@ package ru.avca.robot.grpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import event_hub.EventHubGrpc;
-import event_hub.EventType;
-import event_hub.RegisterRequest;
-import event_hub.RegisterResponse;
+import event_hub.EventRequest;
+import event_hub.EventResponse;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -27,11 +26,11 @@ public class EventHubClient {
     @EventListener
     @Async
     public void subscribeOnStart(StartupEvent event) throws ExecutionException, InterruptedException {
-        ListenableFuture<RegisterResponse> register = stub.register(RegisterRequest.newBuilder()
-                .addTypes(EventType.ROBOT_START)
+        ListenableFuture<EventResponse> register = stub.register(EventRequest.newBuilder()
+                .setFrom("robotImpl")
                 .build()
         );
-        RegisterResponse response = register.get();
+        EventResponse response = register.get();
         LOG.info("Got response {}", response);
     }
 

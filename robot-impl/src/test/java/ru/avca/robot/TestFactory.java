@@ -6,21 +6,19 @@ import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.BinanceApiWebSocketClient;
 import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.account.NewOrderResponse;
-import com.binance.api.client.domain.event.CandlestickEvent;
 import com.binance.api.client.domain.general.*;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.google.common.collect.Lists;
-import io.micronaut.context.annotation.Bean;
+import io.grpc.CallOptions;
+import io.grpc.ClientCall;
+import io.grpc.ManagedChannel;
+import io.grpc.MethodDescriptor;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.annotation.Value;
-import org.mockito.stubbing.OngoingStubbing;
-import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.factory.BinanceFactory;
 
 import javax.inject.Singleton;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +32,13 @@ import static org.mockito.Mockito.*;
 @Factory
 public class TestFactory {
 
+    @Singleton
+    @Replaces(value = ManagedChannel.class)
+    public ManagedChannel eventHubFutureStub() {
+        ManagedChannel mock = mock(ManagedChannel.class);
+        when(mock.newCall(any(MethodDescriptor.class), any(CallOptions.class))).thenReturn(mock(ClientCall.class));
+        return mock;
+    }
     @Singleton
     @Replaces(value = BinanceApiClientFactory.class, factory = BinanceFactory.class)
     public BinanceApiClientFactory binanceApiClientFactory(

@@ -7,18 +7,21 @@ option objc_class_prefix = "EHP";
 
 package event_hub;
 
+//it only got events and send them to all known hosts except host in 'from' field
 service EventHub {
-  rpc Register (RegisterRequest) returns (RegisterResponse) {}
+  rpc Register (EventRequest) returns (EventResponse) {}
 }
 
 enum EventType {
   UNKNOWN = 0;
   ROBOT_START = 1;
 }
-message RegisterRequest {
-  repeated EventType types = 1;
+message EventRequest {
+  string from = 1; //origin of event
+  //something like repeated RobotStartEvent = 2; repeated RobotBuyEvent = 3; and so on
+
 }
 
-message RegisterResponse {
-  bool isRegistered = 1;
+message EventResponse {
+  bool isHandled = 1; //todo really need this?
 }
