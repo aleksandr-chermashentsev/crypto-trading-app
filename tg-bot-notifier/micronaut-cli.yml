@@ -1,0 +1,6 @@
+applicationType: grpc
+defaultPackage: ru.avca
+testFramework: kotest
+sourceLanguage: kotlin
+buildTool: gradle
+features: [ annotation-api, app-name, consul, discovery-consul, github-workflow-docker-registry, gradle, grpc, kotest, kotlin, kotlin-application, logback, readme, shade, yaml ]

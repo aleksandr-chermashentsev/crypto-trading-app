@@ -1,2 +1,2 @@
 rootProject.name = "crypto-stock-app"
-include 'robot-impl', 'grpc-proto', 'event-hub'
+include 'robot-impl', 'grpc-proto', 'event-hub', 'tg-bot-notifier'
