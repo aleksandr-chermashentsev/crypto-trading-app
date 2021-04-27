@@ -1,10 +1,10 @@
 package ru.avca.robot.factory;
 
-import event_hub.EventHubGrpc;
 import io.grpc.ManagedChannel;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.grpc.annotation.GrpcChannel;
+import tradenotifier.TradeNotifierGrpc;
 
 /**
  * @author a.chermashentsev
@@ -13,9 +13,9 @@ import io.micronaut.grpc.annotation.GrpcChannel;
 @Factory
 public class GrpcFactory {
     @Bean
-    EventHubGrpc.EventHubFutureStub futureStub(
-            @GrpcChannel("event-hub") ManagedChannel channel
+    TradeNotifierGrpc.TradeNotifierFutureStub futureStub(
+            @GrpcChannel("tg-bot-notifier") ManagedChannel channel
     ) {
-        return EventHubGrpc.newFutureStub(channel);
+        return TradeNotifierGrpc.newFutureStub(channel);
     }
 }

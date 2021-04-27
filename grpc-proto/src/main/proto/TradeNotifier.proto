@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "tradenotifier";
+option java_outer_classname = "TradeNotifierProto";
+
+package tradenotifier;
+
+//it only got events and send them to all known hosts except host in 'from' field
+service TradeNotifier {
+  rpc Trade (RobotTradeEvent) returns (EventResponse) {}
+}
+
+
+message RobotTradeEvent {
+  enum TradeSide {
+    UNKNOWN = 0;
+    BUY = 1;
+    SELL = 2;
+  }
+  string symbol = 1;
+  double baseQty = 2;
+  double quoteQty = 3;
+  TradeSide side = 4;
+  double expectedPrice = 5;
+}
+
+message EventResponse {
+  bool isHandled = 1; //todo really need this?
+}

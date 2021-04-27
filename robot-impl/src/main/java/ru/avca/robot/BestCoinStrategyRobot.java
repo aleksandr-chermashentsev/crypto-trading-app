@@ -239,11 +239,17 @@ public class BestCoinStrategyRobot {
 
             BigDecimal executedQty = new BigDecimal(newOrderResponse.getExecutedQty());
             currentOpenPositionBalance.put(symbol, executedQty);
-            BigDecimal executedPrice = new BigDecimal(newOrderResponse.getCummulativeQuoteQty()).divide(executedQty, 15, RoundingMode.CEILING);
+            BigDecimal quoteQty = new BigDecimal(newOrderResponse.getCummulativeQuoteQty());
+            BigDecimal executedPrice = quoteQty.divide(executedQty, 15, RoundingMode.CEILING);
             LOG.info("Executed price for {} is {}", symbol, executedPrice);
             currentOpenPositionPrice.put(symbol, executedPrice);
 
-            publisher.publishEventAsync(new RobotEvents.BuyEvent(symbol));
+            publisher.publishEventAsync(new RobotEvents.BuyEvent(
+                    executedQty,
+                    quoteQty,
+                    new BigDecimal(candleBySymbol.getValue().getClose()),
+                    symbol
+            ));
             LOG.info("Open position {} {}", symbol, currentOpenPositionBalance);
             candles.clear();
 

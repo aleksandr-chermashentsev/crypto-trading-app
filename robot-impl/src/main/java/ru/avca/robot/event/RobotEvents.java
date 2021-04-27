@@ -29,6 +29,9 @@ public class RobotEvents {
 
     @Value
     public static class BuyEvent {
+        BigDecimal baseQty;
+        BigDecimal quoteQty;
+        BigDecimal expectedPrice;
         String symbol;
     }
 

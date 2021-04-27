@@ -67,6 +67,7 @@ public class CandlestickListenerTest {
 
         //when
         eventPublisher.publishEvent(new CandlestickEvents.StopListenCandlesticksEvent(key));
+        Thread.sleep(300);
         queue.clear();
 
         eventFuture = messageListener.getEventFromQueue(CandlestickEvents.BinanceCandlestickEvent.class);

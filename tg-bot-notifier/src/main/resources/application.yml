@@ -1,8 +1,17 @@
 micronaut:
   application:
-    name: tgBotNotifier
+    name: tg-bot-notifier
 consul:
   client:
     registration:
       enabled: true
     defaultZone: ${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
+grpc:
+  server:
+    port: 50053
+    keep-alive-time: 3h
+    max-inbound-message-size: 1024
+  client:
+    plaintext: true
+    discovery:
+      enabled: true
