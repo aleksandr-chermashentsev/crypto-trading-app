@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "ru.avca";
+option java_outer_classname = "DatabasePersist";
+option objc_class_prefix = "HLW";
+
+package ru.avca;
+
+service DatabasePersistService {
+  rpc send (DatabasePersistRequest) returns (DatabasePersistReply) {}
+}
+
+message DatabasePersistRequest {
+  string name = 1;
+}
+
+message DatabasePersistReply {
+  string message = 1;
+}

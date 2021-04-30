@@ -1,0 +1,6 @@
+applicationType: grpc
+defaultPackage: ru.avca
+testFramework: kotest
+sourceLanguage: kotlin
+buildTool: gradle
+features: [ annotation-api, app-name, coherence, coherence-grpc-client, data, data-jpa, github-workflow-docker-registry, gradle, grpc, h2, jdbc-hikari, kotest, kotlin, kotlin-application, kotlin-extension-functions, liquibase, logback, readme, shade, yaml ]
