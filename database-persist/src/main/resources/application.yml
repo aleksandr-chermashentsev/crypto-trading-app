@@ -3,11 +3,11 @@ micronaut:
     name: databasePersist
 datasources:
   default:
-    url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:file:./db/tradesDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=TRUE
     driverClassName: org.h2.Driver
-    username: sa
+    username: uaua
     password: ''
-    schema-generate: CREATE_DROP
+    schema-generate: CREATE
     dialect: H2
 coherence.session.default.type: grpc
 jpa.default.properties.hibernate.hbm2ddl.auto: update
