@@ -6,10 +6,37 @@ option java_outer_classname = "TradeNotifierProto";
 
 package tradenotifier;
 
-//it only got events and send them to all known hosts except host in 'from' field
 service TradeNotifier {
   rpc Trade (RobotTradeEvent) returns (EventResponse) {}
 }
+
+service RobotStateService {
+  rpc UpdateOpenPositions (OpenPositionsMsg) returns (Empty);
+  rpc GetAllOpenPositions (Empty) returns (OpenPositionsMsg);
+  rpc SaveCurrencyBalance (CurrencyBalanceMsg) returns (Empty);
+  rpc GetAllCurrencyBalance (Empty) returns (CurrencyBalancesMsg);
+}
+
+message OpenPositionsMsg {
+  repeated OpenPositionMsg openPositions = 1;
+}
+
+message OpenPositionMsg {
+  string symbol = 1;
+  string price = 2;
+  string balance = 3;
+}
+
+message CurrencyBalancesMsg {
+  repeated CurrencyBalanceMsg currencyBalances = 1;
+}
+
+message CurrencyBalanceMsg {
+  string symbol = 1;
+  string balance = 2;
+}
+
+message Empty {}
 
 
 message RobotTradeEvent {
