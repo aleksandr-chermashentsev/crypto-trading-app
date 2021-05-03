@@ -8,7 +8,7 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Async
-import tradenotifier.RobotTradeEvent
+import ru.avca.grpcservices.RobotTradeEvent
 import javax.inject.Inject
 
 /**

@@ -6,7 +6,7 @@ import ru.avca.dbpersist.domain.CurrencyBalanceDomain
 import ru.avca.dbpersist.domain.OpenPositionDomain
 import ru.avca.dbpersist.repository.CurrencyBalanceRepository
 import ru.avca.dbpersist.repository.OpenPositionRepository
-import tradenotifier.*
+import ru.avca.grpcservices.*
 import java.util.stream.Collectors.toList
 import javax.inject.Inject
 

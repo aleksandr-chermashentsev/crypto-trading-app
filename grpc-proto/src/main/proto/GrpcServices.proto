@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "tradenotifier";
-option java_outer_classname = "TradeNotifierProto";
+option java_package = "ru.avca.grpcservices";
+option java_outer_classname = "GrpcServicesProto";
 
 package tradenotifier;
 

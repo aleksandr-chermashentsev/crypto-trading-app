@@ -4,9 +4,9 @@ import io.grpc.stub.StreamObserver
 import io.micronaut.context.annotation.Context
 import ru.avca.dbpersist.domain.TradeDomain
 import ru.avca.dbpersist.repository.TradeRepository
-import tradenotifier.EventResponse
-import tradenotifier.RobotTradeEvent
-import tradenotifier.TradeNotifierGrpc
+import ru.avca.grpcservices.EventResponse
+import ru.avca.grpcservices.RobotTradeEvent
+import ru.avca.grpcservices.TradeNotifierGrpc
 import java.time.Instant
 import javax.inject.Inject
 
