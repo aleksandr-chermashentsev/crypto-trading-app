@@ -23,8 +23,8 @@ grpc:
 
 robot:
   usdCoin: USDT
-  interval: TWELVE_HOURLY
+  interval: ONE_MINUTE
   stopLoss: 0.3
-  takeProfit: 1.2
+  takeProfit: 0
   coinsCount: 1
   initialBalance: 25

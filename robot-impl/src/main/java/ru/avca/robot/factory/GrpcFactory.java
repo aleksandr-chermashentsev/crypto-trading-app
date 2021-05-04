@@ -7,15 +7,26 @@ import io.micronaut.grpc.annotation.GrpcChannel;
 import ru.avca.grpcservices.RobotStateServiceGrpc;
 import ru.avca.grpcservices.TradeNotifierGrpc;
 
+import javax.inject.Named;
+
 /**
  * @author a.chermashentsev
  * Date: 19.04.2021
  **/
 @Factory
 public class GrpcFactory {
+    @Named("tg-bot-notifier")
     @Bean
-    TradeNotifierGrpc.TradeNotifierFutureStub futureStub(
+    TradeNotifierGrpc.TradeNotifierFutureStub tgBotFutureStub(
             @GrpcChannel("tg-bot-notifier") ManagedChannel channel
+    ) {
+        return TradeNotifierGrpc.newFutureStub(channel);
+    }
+
+    @Named("database-persist")
+    @Bean
+    TradeNotifierGrpc.TradeNotifierFutureStub dbPersistFutureStub(
+            @GrpcChannel("database-persist") ManagedChannel channel
     ) {
         return TradeNotifierGrpc.newFutureStub(channel);
     }
