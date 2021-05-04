@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Date: 12.04.2021
  **/
 @MicronautTest
-@Timeout(3)
+@Timeout(10)
 class BestCoinStrategyRobotTest {
 
     @Test
@@ -38,11 +38,30 @@ class BestCoinStrategyRobotTest {
         ApplicationEventPublisher eventPublisher = context.getBean(ApplicationEventPublisher.class);
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT", new BigDecimal(0), new BigDecimal(2), 1, CandlestickInterval.TWELVE_HOURLY, TimeUtils.getCurrentTimeUtc() + 10000, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(2), TimeUtils.getCurrentTimeUtc() + 1000, 1000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> future = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
 
         assertEquals("btc-usdt,eth-usdt,xrp-usdt,tbd-usdt", future.get().getKey().getSymbols());
+    }
+
+    private void sendRobotStartEvent(ApplicationEventPublisher eventPublisher, BigDecimal stopLoss, BigDecimal takeProfit, long nextTimeOrderExecute, int orderExecutionInterval) {
+        eventPublisher.publishEvent(
+                new RobotEvents.RobotStartEvent(
+                        "USDT",
+                        stopLoss,
+                        takeProfit,
+                        1,
+                        CandlestickInterval.TWELVE_HOURLY,
+                        nextTimeOrderExecute,
+                        orderExecutionInterval,
+                        new BigDecimal(30),
+                        new HashMap<>()
+                )
+        );
+    }
+    private void sendRobotStartEvent(ApplicationEventPublisher eventPublisher, BigDecimal takeProfit, long nextTimeOrderExecute, int orderExecutionInterval) {
+        sendRobotStartEvent(eventPublisher, new BigDecimal(0), takeProfit, nextTimeOrderExecute, orderExecutionInterval);
     }
 
     @Test
@@ -54,7 +73,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(2), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 500, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(2), currentTimeUtc, 500);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -86,7 +105,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(2), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 500, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(2), currentTimeUtc, 500);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -112,7 +131,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(2), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(2), currentTimeUtc + 1000, 1000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -143,7 +162,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(1), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(1), currentTimeUtc + 1000, 1000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -178,7 +197,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(1), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 1000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(1), currentTimeUtc + 1000, 1000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -217,7 +236,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal(1), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 300, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(1), currentTimeUtc + 1000, 300);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -259,7 +278,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal(0),new BigDecimal("1.2"), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 3000000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal(0), currentTimeUtc + 1000, 3000000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -292,7 +311,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal("0.8"),new BigDecimal("1.2"), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 3000000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal("0.8"), new BigDecimal("1.2"), currentTimeUtc + 1000, 3000000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
@@ -325,7 +344,7 @@ class BestCoinStrategyRobotTest {
         MessageListenerTestHelper messageListenerTestHelper = context.getBean(MessageListenerTestHelper.class);
 
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
-        eventPublisher.publishEvent(new RobotEvents.RobotStartEvent("USDT",new BigDecimal("0.8"),new BigDecimal("1.2"), 1, CandlestickInterval.TWELVE_HOURLY, currentTimeUtc + 1000, 3000000, new BigDecimal(30)));
+        sendRobotStartEvent(eventPublisher, new BigDecimal("1.2"), currentTimeUtc + 1000, 300000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
         assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
