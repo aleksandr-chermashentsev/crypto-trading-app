@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
  * Date: 01.04.2021
  **/
 @MicronautTest
-@Timeout(value = 3)
+@Timeout(value = 1, unit = TimeUnit.MINUTES)
 public class CandlestickListenerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.THREE_DAILY);
 

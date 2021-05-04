@@ -1,40 +1,28 @@
 package ru.avca.robot;
 
-import com.binance.api.client.BinanceApiClientFactory;
-import com.binance.api.client.BinanceApiWebSocketClient;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.inject.qualifiers.Qualifiers;
-import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-import org.mockito.InjectMocks;
 import ru.avca.robot.event.CandlestickEvents;
-import ru.avca.robot.factory.BinanceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Qualifier;
-import javax.inject.Singleton;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author a.chermashentsev
  * Date: 06.04.2021
  **/
 @MicronautTest
-@Timeout(3)
+@Timeout(value = 1, unit = TimeUnit.MINUTES )
 class CandlestickListenerHealthCheckerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.ONE_MINUTE);
 
