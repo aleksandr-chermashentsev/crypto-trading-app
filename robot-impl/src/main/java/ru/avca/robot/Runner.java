@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.robot.config.RobotConfig;
 import ru.avca.robot.event.RobotEvents;
+import ru.avca.robot.grpc.RobotStateService;
 import ru.avca.robot.utils.TimeUtils;
 
 import javax.inject.Inject;
@@ -34,6 +35,7 @@ public class Runner {
     @Inject private ApplicationEventPublisher eventPublisher;
     @Inject private RobotConfig robotConfig;
     @Inject private BinanceApiClientFactory clientFactory;
+    @Inject private RobotStateService robotStateService;
 
     @EventListener
     @Async
@@ -56,7 +58,9 @@ public class Runner {
                 robotConfig.getInterval(),
                 candlestick.getCloseTime(),
                 intervalMs,
-                new BigDecimal(25) //todo load it from properties or database
+                robotStateService.getUsdtBalance()
+                        .orElseGet(() -> new BigDecimal(robotConfig.getInitialBalance())),
+                robotStateService.loadAllOpenPositionInfos()
         ));
 
     }

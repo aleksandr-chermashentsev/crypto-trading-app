@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.event.RobotEvents;
+import ru.avca.robot.grpc.RobotStateService;
 import ru.avca.robot.utils.TimeUtils;
 
 import javax.inject.Inject;
@@ -52,11 +53,11 @@ public class BestCoinStrategyRobot {
     @Inject private ApplicationEventPublisher publisher;
     @Inject private BinanceApiClientFactory binanceApiClientFactory;
     @Inject @Named(TaskExecutors.SCHEDULED) private TaskScheduler taskScheduler;
+    @Inject private RobotStateService robotStateService;
 
     private final AtomicLong lastTimeTryExecuteOrderCalled = new AtomicLong();
     private final ConcurrentMap<String, CandlestickEvent> candles = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, BigDecimal> currentOpenPositionBalance = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, BigDecimal> currentOpenPositionPrice = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, OpenPositionInfo> openPositionInfosBySymbol = new ConcurrentHashMap<>();
     private final Map<String, BigDecimal> stepSizes = new HashMap<>();
     private final ConcurrentMap<String, Boolean> alreadySubscribedSymbols = new ConcurrentHashMap<>();
     private volatile BigDecimal currentUsdtBalance;
@@ -66,13 +67,14 @@ public class BestCoinStrategyRobot {
     @Async
     public void onRobotStartEvent(RobotEvents.RobotStartEvent event) {
         boolean isAlreadyStarted = isStarted.getAndSet(true);
-        startEvent = event;
-        LOG.info("Got event {}", event);
         if (isAlreadyStarted) {
             LOG.info("Skip event {} because robot is already in started state", event);
             return;
         }
+        startEvent = event;
+        LOG.info("Got event {}", event);
         currentUsdtBalance = event.getInitialUsdtBalance();
+        event.getOpenPositionInfosBySymbol().forEach(openPositionInfosBySymbol::put);
 
         loadSymbols(event.getUsdCoin()).forEach(symbol -> alreadySubscribedSymbols.put(symbol, true));
         updateStepSizes(event);
@@ -120,10 +122,10 @@ public class BestCoinStrategyRobot {
         }
         if (event.getKey().getInterval() == startEvent.getInterval() && alreadySubscribedSymbols.containsKey(event.getBinanceEvent().getSymbol())) {
             candles.put(event.getBinanceEvent().getSymbol(), event.getBinanceEvent());
-            if (!currentOpenPositionPrice.isEmpty()) {
-                BigDecimal price = currentOpenPositionPrice.get(event.getBinanceEvent().getSymbol());
-                if (price != null) {
-                    checkTpAndSl(event, price);
+            if (!openPositionInfosBySymbol.isEmpty()) {
+                OpenPositionInfo info = openPositionInfosBySymbol.get(event.getBinanceEvent().getSymbol());
+                if (info != null) {
+                    checkTpAndSl(event, info.getPrice());
                 }
             }
         }
@@ -160,7 +162,7 @@ public class BestCoinStrategyRobot {
             return;
         }
 
-        if (!currentOpenPositionBalance.isEmpty()) {
+        if (!openPositionInfosBySymbol.isEmpty()) {
             closePosition();
         }
 
@@ -185,6 +187,7 @@ public class BestCoinStrategyRobot {
 
         bestCoins.forEach(bestCoin -> openPosition(bestCoin, currentUsdtBalance.divide(new BigDecimal(startEvent.getCoinsCount()), 15, RoundingMode.CEILING)));
 
+        robotStateService.saveOpenPositions(openPositionInfosBySymbol.values().stream());
         Set<String> newSymbols = loadSymbols(startEvent.getUsdCoin())
                 .filter(symbol -> !alreadySubscribedSymbols.containsKey(symbol))
                 .peek(symbol -> alreadySubscribedSymbols.put(symbol, true))
@@ -196,12 +199,12 @@ public class BestCoinStrategyRobot {
     }
 
     private void closePosition() {
-        LOG.info("Close position in {}", currentOpenPositionBalance.keySet());
+        LOG.info("Close position in {}", openPositionInfosBySymbol.keySet());
 
-        Map<String, BigDecimal> expectedQuantities = currentOpenPositionBalance.entrySet().stream()
+        Map<String, BigDecimal> expectedQuantities = openPositionInfosBySymbol.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().remainder(stepSizes.get(entry.getKey())).negate().add(entry.getValue()))
+                        entry -> entry.getValue().getBalance().remainder(stepSizes.get(entry.getKey())).negate().add(entry.getValue().getBalance()))
                 );
         LOG.info("Try to close {}", expectedQuantities);
         expectedQuantities.forEach((symbol, expectedQty) -> {
@@ -212,7 +215,7 @@ public class BestCoinStrategyRobot {
                     null,
                     expectedQty.stripTrailingZeros().toPlainString()
             );
-            currentOpenPositionBalance.remove(symbol);
+            openPositionInfosBySymbol.remove(symbol);
             NewOrderResponse response = binanceApiClientFactory.newRestClient().newOrder(newOrder);
             LOG.info("Close position response {}", response);
             currentUsdtBalance = new BigDecimal(response.getCummulativeQuoteQty());
@@ -220,7 +223,9 @@ public class BestCoinStrategyRobot {
             LOG.info("Current usdt balance {}", currentUsdtBalance);
         });
 
-        currentOpenPositionBalance.clear();
+        openPositionInfosBySymbol.clear();
+        robotStateService.saveOpenPositions(Stream.empty());
+        robotStateService.saveCurrencyBalance("USDT", currentUsdtBalance);
     }
 
     private void openPosition(Map.Entry<String, CandlestickEvent> candleBySymbol, BigDecimal usdtBalance) {
@@ -238,11 +243,11 @@ public class BestCoinStrategyRobot {
             LOG.info("Open position response {}", newOrderResponse);
 
             BigDecimal executedQty = new BigDecimal(newOrderResponse.getExecutedQty());
-            currentOpenPositionBalance.put(symbol, executedQty);
             BigDecimal quoteQty = new BigDecimal(newOrderResponse.getCummulativeQuoteQty());
             BigDecimal executedPrice = quoteQty.divide(executedQty, 15, RoundingMode.CEILING);
+            OpenPositionInfo info = new OpenPositionInfo(symbol, executedQty, executedPrice);
+            openPositionInfosBySymbol.put(symbol, info);
             LOG.info("Executed price for {} is {}", symbol, executedPrice);
-            currentOpenPositionPrice.put(symbol, executedPrice);
 
             publisher.publishEventAsync(new RobotEvents.BuyEvent(
                     executedQty,
@@ -250,7 +255,7 @@ public class BestCoinStrategyRobot {
                     new BigDecimal(candleBySymbol.getValue().getClose()),
                     symbol
             ));
-            LOG.info("Open position {} {}", symbol, currentOpenPositionBalance);
+            LOG.info("Open position {} {}", symbol, info);
             candles.clear();
 
         } catch (Exception e) {

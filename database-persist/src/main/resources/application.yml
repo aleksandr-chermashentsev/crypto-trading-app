@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: databasePersist
+    name: database-persist
 datasources:
   default:
     url: jdbc:h2:file:./db/tradesDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=TRUE
@@ -9,5 +9,19 @@ datasources:
     password: ''
     schema-generate: CREATE
     dialect: H2
-coherence.session.default.type: grpc
 jpa.default.properties.hibernate.hbm2ddl.auto: update
+grpc:
+  server:
+    port: 50055
+    keep-alive-time: 3h
+    max-inbound-message-size: 1024
+  client:
+    plaintext: true
+    discovery:
+      enabled: true
+consul:
+  client:
+    registration:
+      enabled: true
+      check.enabled: false
+    defaultZone: ${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}

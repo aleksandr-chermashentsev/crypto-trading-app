@@ -2,8 +2,10 @@ package ru.avca.robot.event;
 
 import com.binance.api.client.domain.market.CandlestickInterval;
 import lombok.Value;
+import ru.avca.robot.OpenPositionInfo;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author a.chermashentsev
@@ -22,6 +24,7 @@ public class RobotEvents {
         long nextTimeOrderExecute;
         long orderExecuteInterval;
         BigDecimal initialUsdtBalance;
+        Map<String, OpenPositionInfo> openPositionInfosBySymbol;
     }
 
     public static class TryExecuteOrderEvent {

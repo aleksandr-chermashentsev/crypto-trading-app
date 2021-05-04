@@ -15,6 +15,8 @@ public class RobotConfig {
     private double takeProfit;
     private int coinsCount;
 
+    private int initialBalance;
+
     public String getUsdCoin() {
         return usdCoin;
     }
@@ -55,6 +57,13 @@ public class RobotConfig {
         this.coinsCount = coinsCount;
     }
 
+    public int getInitialBalance() {
+        return initialBalance;
+    }
+
+    public void setInitialBalance(int initialBalance) {
+        this.initialBalance = initialBalance;
+    }
     @Override
     public String toString() {
         return "RobotConfig{" +
@@ -63,6 +72,7 @@ public class RobotConfig {
                 ", stopLoss=" + stopLoss +
                 ", takeProfit=" + takeProfit +
                 ", coinsCount=" + coinsCount +
+                ", initialBalance=" + initialBalance +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package ru.avca.dbpersist.repository
 
+import io.micronaut.transaction.annotation.TransactionalAdvice
 import ru.avca.dbpersist.domain.CurrencyBalanceDomain
 import java.util.stream.Stream
 import javax.inject.Singleton
@@ -7,6 +8,7 @@ import javax.persistence.EntityManager
 import javax.transaction.Transactional
 
 @Singleton
+@TransactionalAdvice
 open class CurrencyBalanceRepositoryImpl(
     private val em: EntityManager
 ) : CurrencyBalanceRepository {

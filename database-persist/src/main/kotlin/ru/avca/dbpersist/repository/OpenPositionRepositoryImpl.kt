@@ -1,5 +1,6 @@
 package ru.avca.dbpersist.repository
 
+import io.micronaut.transaction.annotation.TransactionalAdvice
 import ru.avca.dbpersist.domain.OpenPositionDomain
 import java.util.stream.Stream
 import javax.inject.Singleton
@@ -7,6 +8,7 @@ import javax.persistence.EntityManager
 import javax.transaction.Transactional
 
 @Singleton
+@TransactionalAdvice
 open class OpenPositionRepositoryImpl(
     private val em: EntityManager
 ) : OpenPositionRepository {
@@ -20,6 +22,7 @@ open class OpenPositionRepositoryImpl(
 
     override fun getAllOpenPositions(): Stream<OpenPositionDomain> {
         return em.createQuery("select op from OpenPositionDomain op", OpenPositionDomain::class.java)
-            .resultStream
+            .resultList
+            .stream()
     }
 }

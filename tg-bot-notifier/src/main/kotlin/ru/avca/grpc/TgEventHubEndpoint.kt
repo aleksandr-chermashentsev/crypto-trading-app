@@ -3,9 +3,9 @@ package ru.avca.grpc
 import io.grpc.stub.StreamObserver
 import io.micronaut.context.annotation.Context
 import io.micronaut.context.event.ApplicationEventPublisher
-import tradenotifier.EventResponse
-import tradenotifier.RobotTradeEvent
-import tradenotifier.TradeNotifierGrpc
+import ru.avca.grpcservices.EventResponse
+import ru.avca.grpcservices.RobotTradeEvent
+import ru.avca.grpcservices.TradeNotifierGrpc
 import javax.inject.Inject
 
 /**

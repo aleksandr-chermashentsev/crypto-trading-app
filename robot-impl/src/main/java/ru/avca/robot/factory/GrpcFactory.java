@@ -4,6 +4,7 @@ import io.grpc.ManagedChannel;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.grpc.annotation.GrpcChannel;
+import ru.avca.grpcservices.RobotStateServiceGrpc;
 import ru.avca.grpcservices.TradeNotifierGrpc;
 
 /**
@@ -17,5 +18,11 @@ public class GrpcFactory {
             @GrpcChannel("tg-bot-notifier") ManagedChannel channel
     ) {
         return TradeNotifierGrpc.newFutureStub(channel);
+    }
+
+    @Bean RobotStateServiceGrpc.RobotStateServiceBlockingStub robotStateServiceBlockingStub(
+            @GrpcChannel("database-persist") ManagedChannel channel
+    ) {
+        return RobotStateServiceGrpc.newBlockingStub(channel);
     }
 }

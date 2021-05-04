@@ -27,3 +27,4 @@ robot:
   stopLoss: 0.3
   takeProfit: 1.2
   coinsCount: 1
+  initialBalance: 25
