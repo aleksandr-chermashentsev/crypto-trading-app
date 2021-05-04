@@ -217,7 +217,7 @@ public class BestCoinStrategyRobot {
             );
             openPositionInfosBySymbol.remove(symbol);
             NewOrderResponse response = binanceApiClientFactory.newRestClient().newOrder(newOrder);
-            LOG.info("Close position response {}", response);
+            LOG.error("Close position response {}", response);
             currentUsdtBalance = new BigDecimal(response.getCummulativeQuoteQty());
             publisher.publishEvent(new RobotEvents.SellEvent(symbol, currentUsdtBalance));
             LOG.info("Current usdt balance {}", currentUsdtBalance);
