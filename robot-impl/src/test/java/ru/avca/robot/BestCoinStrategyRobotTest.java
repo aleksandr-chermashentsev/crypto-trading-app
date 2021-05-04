@@ -5,6 +5,7 @@ import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import ru.avca.robot.event.CandlestickEvents;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BestCoinStrategyRobotTest {
 
     @Test
+    @Disabled
     public void shouldSubscribeOnAllSymbolsWhenGotStartEvent() throws InterruptedException, ExecutionException {
 
         Map<String, Object> values = new HashMap<>();
@@ -65,6 +67,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldSaveCandlesDataOnlyForHisSubscriptions() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -97,6 +100,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldSendBuyEventWhenBuyExecuted() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -123,6 +127,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldOpenPositionInBiggestCandle() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -154,6 +159,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldUpdateCandleWithLatestValue() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -189,6 +195,7 @@ class BestCoinStrategyRobotTest {
 
 
     @Test
+    @Disabled
     public void shouldNotBuyIfNoPositiveCandles() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -267,6 +274,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldSellWhenHitTakeProfit() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("robot.minDelayBetweenOrderExecutesMs", 0);
@@ -299,7 +307,9 @@ class BestCoinStrategyRobotTest {
         assertEquals(candle.getSymbol(), sellEvent.getSymbol());
     }
 
+
     @Test
+    @Disabled
     public void shouldSellWhenHitStopLoss() throws InterruptedException, ExecutionException, TimeoutException {
         Map<String, Object> values = new HashMap<>();
         values.put("robot.minDelayBetweenOrderExecutesMs", 0);
@@ -333,6 +343,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
+    @Disabled
     public void shouldNotSellWhenDoesntHitSlOrTp() throws InterruptedException, ExecutionException {
         Map<String, Object> values = new HashMap<>();
         values.put("robot.minDelayBetweenOrderExecutesMs", 0);
