@@ -300,7 +300,7 @@ class BestCoinStrategyRobotTest {
     }
 
     @Test
-    public void shouldSellWhenHitStopLoss() throws InterruptedException, ExecutionException {
+    public void shouldSellWhenHitStopLoss() throws InterruptedException, ExecutionException, TimeoutException {
         Map<String, Object> values = new HashMap<>();
         values.put("robot.minDelayBetweenOrderExecutesMs", 0);
         values.put("test.symbols_list", "BTC-USDT,ETH-USDT,XRP-USDT,TBD-USDT");
@@ -314,7 +314,7 @@ class BestCoinStrategyRobotTest {
         sendRobotStartEvent(eventPublisher, new BigDecimal("0.8"), new BigDecimal("1.2"), currentTimeUtc + 1000, 3000000);
 
         Future<CandlestickEvents.StartListenCandlesticksEvent> startListenEventFuture = messageListenerTestHelper.getEventFromQueue(CandlestickEvents.StartListenCandlesticksEvent.class);
-        assertNotNull(startListenEventFuture.get(), "StartListenCandlesticksEvent wasn't published");
+        assertNotNull(startListenEventFuture.get(1, TimeUnit.SECONDS), "StartListenCandlesticksEvent wasn't published");
 
         CandlestickEvent candle = createCandle(TimeUtils.getCurrentTimeUtc(), "BTC-USDT", "100", "90", "100");
         eventPublisher.publishEvent(new CandlestickEvents.BinanceCandlestickEvent(candle, new CandlestickEvents.ListenerKey("test", CandlestickInterval.TWELVE_HOURLY)));
@@ -322,13 +322,13 @@ class BestCoinStrategyRobotTest {
         messageListenerTestHelper.getQueue().clear();
 
         Future<RobotEvents.TryExecuteOrderEvent> tryExecuteOrderEventFuture = messageListenerTestHelper.getEventFromQueue(RobotEvents.TryExecuteOrderEvent.class);
-        assertNotNull(tryExecuteOrderEventFuture.get(), "First TryExecuteOrderEvent wasn't published");
+        assertNotNull(tryExecuteOrderEventFuture.get(1, TimeUnit.SECONDS), "First TryExecuteOrderEvent wasn't published");
 
         messageListenerTestHelper.getQueue().clear();
         candle = createCandle(TimeUtils.getCurrentTimeUtc(), "BTC-USDT", "80", "90", "79");
         eventPublisher.publishEvent(new CandlestickEvents.BinanceCandlestickEvent(candle, new CandlestickEvents.ListenerKey("test", CandlestickInterval.TWELVE_HOURLY)));
         Future<RobotEvents.SellEvent> sellEventFuture = messageListenerTestHelper.getEventFromQueue(RobotEvents.SellEvent.class);
-        RobotEvents.SellEvent sellEvent = sellEventFuture.get();
+        RobotEvents.SellEvent sellEvent = sellEventFuture.get(1, TimeUnit.SECONDS);
         assertEquals(candle.getSymbol(), sellEvent.getSymbol());
     }
 
