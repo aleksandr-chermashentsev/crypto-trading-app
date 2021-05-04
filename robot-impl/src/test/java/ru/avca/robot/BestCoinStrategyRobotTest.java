@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Date: 12.04.2021
  **/
 @MicronautTest
-@Timeout(value = 1, unit = TimeUnit.MINUTES)
+@Timeout(10)
 class BestCoinStrategyRobotTest {
 
     @Test

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Date: 06.04.2021
  **/
 @MicronautTest
-@Timeout(value = 1, unit = TimeUnit.MINUTES )
+@Timeout(3)
 class CandlestickListenerHealthCheckerTest {
     private final CandlestickEvents.ListenerKey key = new CandlestickEvents.ListenerKey("test", CandlestickInterval.ONE_MINUTE);
 
