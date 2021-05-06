@@ -1,10 +1,6 @@
 package ru.avca.robot;
 
-import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.scheduling.annotation.Async;
-import ru.avca.robot.event.CandlestickEvents;
-import ru.avca.robot.event.RobotEvents;
 
 import javax.inject.Singleton;
 import java.util.Optional;
@@ -19,7 +15,6 @@ import java.util.concurrent.*;
 public class MessageListenerTestHelper {
     private ConcurrentLinkedQueue queue = new ConcurrentLinkedQueue<>();
 
-    @Async
     @EventListener
     public void onEvent(Object event) {
         queue.add(event);
