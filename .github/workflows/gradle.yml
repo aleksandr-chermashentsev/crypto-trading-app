@@ -43,4 +43,4 @@ jobs:
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/tg-bot-notifier" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
           cd ../tg-bot-notifier
-          ./gradlew check docker
+          ./gradlew check dockerPush --no-daemon
