@@ -1,6 +1,8 @@
 micronaut:
   application:
     name: robot-impl
+  server:
+    port: 8083
 hystrix.stream.enabled: false
 
 consul:
@@ -23,8 +25,13 @@ grpc:
 
 robot:
   usdCoin: USDT
-  interval: ONE_MINUTE
+  interval: TWELVE_HOURLY
   stopLoss: 0.3
   takeProfit: 2
   coinsCount: 1
   initialBalance: 25
+
+endpoints:
+  health:
+    enabled: true
+    sensitive: false

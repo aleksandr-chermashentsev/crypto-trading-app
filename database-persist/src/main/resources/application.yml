@@ -1,6 +1,8 @@
 micronaut:
   application:
     name: database-persist
+  server:
+    port: 8081
 datasources:
   default:
     url: jdbc:h2:file:./db/tradesDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=TRUE
@@ -25,3 +27,7 @@ consul:
       enabled: true
       check.enabled: false
     defaultZone: ${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
+endpoints:
+  health:
+    enabled: true
+    sensitive: false

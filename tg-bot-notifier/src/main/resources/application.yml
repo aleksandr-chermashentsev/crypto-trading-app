@@ -1,6 +1,8 @@
 micronaut:
   application:
     name: tg-bot-notifier
+  server:
+    port: 8082
 consul:
   client:
     registration:
@@ -15,3 +17,7 @@ grpc:
     plaintext: true
     discovery:
       enabled: true
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
