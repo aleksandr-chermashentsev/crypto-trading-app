@@ -12,21 +12,80 @@ spec:
         app: "robot-impl"
     spec:
       containers:
-        - name: "robot-impl"
-          image: "hehehuhu/acherm-repo:robot-impl"
+        - name: "consul"
+          image: "consul:latest"
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 8500
+        - name: "database-persist"
+          image: "gcr.io/crypto-stock-app-310819/database-persist:0.1"
+          ports:
+            - name: http
+              containerPort: 8081
+          imagePullPolicy: Always
           readinessProbe:
             httpGet:
               path: /health/readiness
-              port: 8080
+              port: 8081
             initialDelaySeconds: 5
             timeoutSeconds: 3
           livenessProbe:
             httpGet:
               path: /health/liveness
-              port: 8080
+              port: 8081
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 10
+        - name: "tg-bot-notifier"
+          image: "gcr.io/crypto-stock-app-310819/tg-bot-notifier:0.1"
+          env:
+            - name: telegram.token
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-stock-app-secrets
+                  key: telegram.token
+            - name: telegram.adminUsername
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-stock-app-secrets
+                  key: telegram.adminUsername
+            - name: telegram.adminChatId
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-stock-app-secrets
+                  key: telegram.adminChatId
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8082
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 8082
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 8082
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 10
+        - name: "robot-impl"
+          image: "hehehuhu/acherm-repo:robot-impl"
+          ports:
+            - name: http
+              containerPort: 8083
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 8083
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 8083
             initialDelaySeconds: 5
             timeoutSeconds: 3
             failureThreshold: 10

@@ -25,6 +25,6 @@ robot:
   usdCoin: USDT
   interval: ONE_MINUTE
   stopLoss: 0.3
-  takeProfit: 0
+  takeProfit: 2
   coinsCount: 1
   initialBalance: 25
