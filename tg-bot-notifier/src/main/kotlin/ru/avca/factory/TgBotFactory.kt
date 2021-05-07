@@ -14,6 +14,6 @@ import io.micronaut.context.annotation.Value
 class TgBotFactory {
     @Bean
     fun telegramBot(@Value("\${telegram.token}") telegramToken: String) : TelegramBot {
-        return TelegramBot(telegramToken)
+        return TelegramBot(telegramToken.trim())
     }
 }

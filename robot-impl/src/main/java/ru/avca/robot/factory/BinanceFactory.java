@@ -17,6 +17,6 @@ public class BinanceFactory {
     public BinanceApiClientFactory binanceApiClientFactory(
             @Value("${exchange.binance.api.key}") String apiKey,
             @Value("${exchange.binance.api.secret}") String apiSecret) {
-        return BinanceApiClientFactory.newInstance(apiKey, apiSecret);
+        return BinanceApiClientFactory.newInstance(apiKey.trim(), apiSecret.trim());
     }
 }

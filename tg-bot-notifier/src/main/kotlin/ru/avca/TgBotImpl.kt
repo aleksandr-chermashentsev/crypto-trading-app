@@ -27,7 +27,7 @@ open class TgBotImpl(
     open fun onStartup(event: StartupEvent) {
         telegramBot.setUpdatesListener {
             it.forEach {
-                if (adminChatId == null && it.message().from().username() == adminUserName) {
+                if (adminChatId == null && it.message().from().username() == adminUserName.trim()) {
                     adminChatId = it.message().chat().id()
                 }
             }
