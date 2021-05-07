@@ -9,6 +9,7 @@ consul:
   client:
     registration:
       enabled: true
+      check.enabled: false
     defaultZone: "${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}"
 candlestickListener:
   possible_gap_in_updates_ms: 60_000
