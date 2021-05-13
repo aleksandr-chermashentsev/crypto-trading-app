@@ -50,6 +50,9 @@ java {
     targetCompatibility = JavaVersion.toVersion("15")
 }
 
+dockerfile {
+    args('-Dmicronaut.config.files=\'/config/application.yml\'')
+}
 
 dockerBuild {
     images = ["${System.env.DOCKER_IMAGE ?: project.name}:$project.version"]
