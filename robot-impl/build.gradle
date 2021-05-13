@@ -51,7 +51,7 @@ java {
 }
 
 dockerfile {
-    args('-Dmicronaut.config.files=\'/home/app/resources/prod/application.yml\'')
+    args('-Dmicronaut.config.files=/home/app/resources/prod/application.yml')
 }
 
 dockerBuild {
