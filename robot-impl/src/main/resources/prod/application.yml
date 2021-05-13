@@ -1,0 +1,38 @@
+micronaut:
+  application:
+    name: robot-impl
+  server:
+    port: 8083
+hystrix.stream.enabled: false
+
+consul:
+  client:
+    registration:
+      enabled: true
+      check.enabled: false
+    defaultZone: "${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}"
+candlestickListener:
+  possible_gap_in_updates_ms: 60_000
+  check_time_period_multiplier: 10
+grpc:
+  client:
+    plaintext: true
+    discovery:
+      enabled: true
+  server:
+    port: 50052
+    keep-alive-time: 3h
+    max-inbound-message-size: 1024
+
+robot:
+  usdCoin: USDT
+  interval: ONE_MINUTE
+  stopLoss: 0.3
+  takeProfit: 2
+  coinsCount: 1
+  initialBalance: 25
+
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
