@@ -8,6 +8,7 @@ consul:
     registration:
       enabled: true
       check.enabled: false
+      prefer-ip-address: true
     defaultZone: ${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
 grpc:
   server:
