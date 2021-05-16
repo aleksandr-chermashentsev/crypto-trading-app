@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "robot-impl"
+  name: "robot-service"
 spec:
   selector:
     matchLabels:
-      app: "robot-impl"
+      app: "robot-service"
   template:
     metadata:
       labels:
-        app: "robot-impl"
+        app: "robot-service"
     spec:
       containers:
         - name: "consul"
@@ -36,6 +36,9 @@ spec:
             initialDelaySeconds: 5
             timeoutSeconds: 3
             failureThreshold: 10
+          volumeMounts:
+            - mountPath: /home/app/db
+              name: db-storage
         - name: "tg-bot-notifier"
           image: "gcr.io/crypto-stock-app-310819/tg-bot-notifier:0.1"
           env:
@@ -72,7 +75,23 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 10
         - name: "robot-impl"
-          image: "hehehuhu/acherm-repo:robot-impl"
+          image: "gcr.io/crypto-stock-app-310819/robot-impl:0.1"
+          env:
+            - name: exchange.binance.api.secret
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-stock-app-secrets
+                  key: exchange.binance.api.secret
+            - name: exchange.binance.api.key
+              valueFrom:
+                secretKeyRef:
+                  name: crypto-stock-app-secrets
+                  key: exchange.binance.api.key
+          volumeMounts:
+            - name: config
+              mountPath: "/home/app/resources/prod"
+              readOnly: false
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8083
@@ -89,3 +108,15 @@ spec:
             initialDelaySeconds: 5
             timeoutSeconds: 3
             failureThreshold: 10
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: db-storage-claim
+        - name: config
+          configMap:
+            # Provide the name of the ConfigMap you want to mount.
+            name: robot-impl-config
+            # An array of keys from the ConfigMap to create as files
+            items:
+              - key: "application.yml"
+                path: "application.yml"
