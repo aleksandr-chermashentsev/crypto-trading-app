@@ -18,11 +18,10 @@ spec:
             - name: http
               containerPort: 8500
         - name: "database-persist"
-          image: "gcr.io/crypto-stock-app-310819/database-persist:0.1"
+          image: "gcr.io/crypto-stock-app-310819/database-persist:0.101"
           ports:
             - name: http
               containerPort: 8081
-          imagePullPolicy: Always
           readinessProbe:
             httpGet:
               path: /health/readiness
@@ -57,7 +56,6 @@ spec:
                 secretKeyRef:
                   name: crypto-stock-app-secrets
                   key: telegram.adminChatId
-          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8082
@@ -91,7 +89,6 @@ spec:
             - name: config
               mountPath: "/home/app/resources/prod"
               readOnly: false
-          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8083

@@ -32,5 +32,7 @@ class TradeEndpoint(
                 request.side.toString()
             )
         )
+        responseObserver?.onNext(EventResponse.getDefaultInstance())
+        responseObserver?.onCompleted()
     }
 }
