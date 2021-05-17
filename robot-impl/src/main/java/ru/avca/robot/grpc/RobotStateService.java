@@ -35,11 +35,16 @@ public class RobotStateService {
     }
 
     public Optional<BigDecimal> getUsdtBalance() {
-        return robotStateServiceBlockingStub.getAllCurrencyBalance(Empty.getDefaultInstance())
-                .getCurrencyBalancesList().stream()
-                .filter(msg -> "USDT".equals(msg.getSymbol().toUpperCase(Locale.ROOT)))
-                .map(msg -> new BigDecimal(msg.getBalance()))
-                .findAny();
+        try {
+            return robotStateServiceBlockingStub.getAllCurrencyBalance(Empty.getDefaultInstance())
+                    .getCurrencyBalancesList().stream()
+                    .filter(msg -> "USDT".equals(msg.getSymbol().toUpperCase(Locale.ROOT)))
+                    .map(msg -> new BigDecimal(msg.getBalance()))
+                    .findAny();
+        } catch (Exception e) {
+            System.exit(1);
+            return Optional.empty();
+        }
     }
 
     public void saveOpenPositions(Stream<OpenPositionInfo> openPositionInfos) {
