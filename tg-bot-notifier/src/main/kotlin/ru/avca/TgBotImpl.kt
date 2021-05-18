@@ -8,6 +8,8 @@ import io.micronaut.context.annotation.Value
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Async
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import ru.avca.grpcservices.RobotTradeEvent
 import javax.inject.Inject
 
@@ -20,11 +22,21 @@ import javax.inject.Inject
 open class TgBotImpl(
     @Inject val telegramBot: TelegramBot,
     @Value("\${telegram.adminUsername}") val adminUserName: String,
-    @Volatile @Value("\${telegram.adminChatId:null}") var adminChatId: Long?
+    @Value("\${telegram.adminChatId:}") var adminChatIdStr: String,
 ) {
+    private val LOG: Logger = LoggerFactory.getLogger(TgBotImpl::class.java)
+    @Volatile var adminChatId: Long? = null
+
     @EventListener
     @Async
     open fun onStartup(event: StartupEvent) {
+        if (adminChatIdStr.isNotEmpty()) {
+            LOG.info("adminChatIdStr is {}. Try to parse", adminChatIdStr)
+            adminChatId = adminChatIdStr.toLong()
+            LOG.info("adminChatId set to {}", adminChatId)
+        } else {
+            LOG.info("adminChatId property is empty, wait for message from {}", adminUserName)
+        }
         telegramBot.setUpdatesListener {
             it.forEach {
                 if (adminChatId == null && it.message().from().username() == adminUserName.trim()) {
@@ -39,6 +51,10 @@ open class TgBotImpl(
     @EventListener
     @Async
     open fun onTradeEvent(event: RobotTradeEvent) {
+        if (adminChatId == null) {
+            LOG.info("Do nothing on trade event because adminChatId is not set")
+            return
+        }
         if (event.side == RobotTradeEvent.TradeSide.BUY) {
             telegramBot.execute(SendMessage(adminChatId, "Something was bought"))
         }
