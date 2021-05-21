@@ -17,6 +17,11 @@ service RobotStateService {
   rpc GetAllCurrencyBalance (Empty) returns (CurrencyBalancesMsg);
 }
 
+service RobotStateManager {
+  rpc ClosePositions (ClosePositionsMsg) returns (ClosePositionsResponse);
+  rpc SetUsdBalance (SetUsdBalanceMsg) returns (SetUsdBalanceResponse);
+}
+
 message OpenPositionsMsg {
   repeated OpenPositionMsg openPositions = 1;
 }
@@ -54,4 +59,20 @@ message RobotTradeEvent {
 
 message EventResponse {
   bool isHandled = 1; //todo really need this?
+}
+
+message SetUsdBalanceMsg {
+  string balance = 1;
+}
+
+message SetUsdBalanceResponse {
+  bool success = 1;
+}
+
+message ClosePositionsMsg {
+  repeated string symbols = 1; //if empty, than close all
+}
+
+message ClosePositionsResponse {
+  bool success = 1;
 }

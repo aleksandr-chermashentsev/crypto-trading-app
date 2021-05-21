@@ -11,6 +11,7 @@ import io.micronaut.scheduling.annotation.Async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import ru.avca.grpcservices.RobotTradeEvent
+import ru.avca.tg.handler.MainHandler
 import javax.inject.Inject
 
 /**
@@ -21,11 +22,13 @@ import javax.inject.Inject
 @Context
 open class TgBotImpl(
     @Inject val telegramBot: TelegramBot,
+    @Inject val mainHandler: MainHandler,
     @Value("\${telegram.adminUsername}") val adminUserName: String,
     @Value("\${telegram.adminChatId:}") var adminChatIdStr: String,
 ) {
     private val LOG: Logger = LoggerFactory.getLogger(TgBotImpl::class.java)
     @Volatile var adminChatId: Long? = null
+    private var currentHandler:TgHandler = mainHandler
 
     @EventListener
     @Async
@@ -42,6 +45,7 @@ open class TgBotImpl(
                 if (adminChatId == null && it.message().from().username() == adminUserName.trim()) {
                     adminChatId = it.message().chat().id()
                 }
+                currentHandler = currentHandler.handle(it)
             }
 
             UpdatesListener.CONFIRMED_UPDATES_ALL

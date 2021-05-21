@@ -61,6 +61,7 @@ public class BestCoinStrategyRobot {
     private final Map<String, BigDecimal> stepSizes = new HashMap<>();
     private final ConcurrentMap<String, Boolean> alreadySubscribedSymbols = new ConcurrentHashMap<>();
     private volatile BigDecimal currentUsdtBalance;
+    private volatile BigDecimal newUsdtBalance;
     private volatile RobotEvents.RobotStartEvent startEvent;
 
     @EventListener
@@ -198,7 +199,7 @@ public class BestCoinStrategyRobot {
         }
     }
 
-    private void closePosition() {
+    public Map<String, Boolean> closePosition() {
         LOG.info("Close position in {}", openPositionInfosBySymbol.keySet());
 
         Map<String, BigDecimal> expectedQuantities = openPositionInfosBySymbol.entrySet().stream()
@@ -207,6 +208,7 @@ public class BestCoinStrategyRobot {
                         entry -> entry.getValue().getBalance().remainder(stepSizes.get(entry.getKey())).negate().add(entry.getValue().getBalance()))
                 );
         LOG.info("Try to close {}", expectedQuantities);
+        HashMap<String, Boolean> result = new HashMap<>();
         expectedQuantities.forEach((symbol, expectedQty) -> {
             NewOrder newOrder = new NewOrder(
                     symbol,
@@ -219,13 +221,19 @@ public class BestCoinStrategyRobot {
             NewOrderResponse response = binanceApiClientFactory.newRestClient().newOrder(newOrder);
             LOG.error("Close position response {}", response);
             currentUsdtBalance = new BigDecimal(response.getCummulativeQuoteQty());
+            if (newUsdtBalance != null) {
+                currentUsdtBalance = newUsdtBalance;
+                newUsdtBalance = null;
+            }
             publisher.publishEvent(new RobotEvents.SellEvent(symbol, currentUsdtBalance));
             LOG.info("Current usdt balance {}", currentUsdtBalance);
+            result.put(symbol, true);
         });
 
         openPositionInfosBySymbol.clear();
         robotStateService.saveOpenPositions(Stream.empty());
         robotStateService.saveCurrencyBalance("USDT", currentUsdtBalance);
+        return result;
     }
 
     private void openPosition(Map.Entry<String, CandlestickEvent> candleBySymbol, BigDecimal usdtBalance) {
@@ -273,4 +281,13 @@ public class BestCoinStrategyRobot {
                 .map(SymbolInfo::getSymbol);
     }
 
+    public void setUsdBalance(BigDecimal newBalance) {
+        if (openPositionInfosBySymbol.isEmpty()) {
+            currentUsdtBalance = newBalance;
+        }
+        else {
+            newUsdtBalance = newBalance;
+        }
+        LOG.info("Usdt balance updated. {}", newBalance);
+    }
 }
