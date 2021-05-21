@@ -52,7 +52,6 @@ java {
 
 dockerfile {
     args('-Xmx64m')
-    args('-Dmicronaut.config.files=/home/app/resources/prod/application.yml')
 }
 
 tasks {
