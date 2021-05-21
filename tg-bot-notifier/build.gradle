@@ -7,7 +7,7 @@ plugins {
     id("com.google.protobuf") version "0.8.13"
 }
 
-version = "0.1"
+version = "0.101"
 group = "ru.avca"
 
 repositories {
@@ -48,6 +48,11 @@ application {
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("11")
+}
+
+dockerfile {
+    args('-Xmx64m')
+    args('-Dmicronaut.config.files=/home/app/resources/prod/application.yml')
 }
 
 tasks {

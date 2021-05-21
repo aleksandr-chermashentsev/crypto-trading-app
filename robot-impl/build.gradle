@@ -5,7 +5,7 @@ plugins {
     id("io.micronaut.application") version "1.4.2"
 }
 
-version = "0.1"
+version = "0.101"
 group = "ru.avca"
 
 repositories {
@@ -51,6 +51,7 @@ java {
 }
 
 dockerfile {
+    args('-Xmx128m')
     args('-Dmicronaut.config.files=/home/app/resources/prod/application.yml')
 }
 
