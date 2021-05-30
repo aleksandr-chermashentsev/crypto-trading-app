@@ -10,9 +10,12 @@ import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import ru.avca.grpcservices.RobotRestartEvent
+import ru.avca.grpcservices.RobotStartEvent
 import ru.avca.grpcservices.RobotTradeEvent
 import ru.avca.tg.handler.MainHandler
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  *
@@ -60,7 +63,32 @@ open class TgBotImpl(
             return
         }
         if (event.side == RobotTradeEvent.TradeSide.BUY) {
-            telegramBot.execute(SendMessage(adminChatId, "Something was bought"))
+            val price = event.quoteQty / event.baseQty
+            telegramBot.execute(SendMessage(adminChatId,
+                "${event.symbol} was bought\n" +
+                        "💵 USDT quantity ${event.quoteQty}" +
+                        "🗑 Slippage is ${((1 - price / event.expectedPrice) * 100).roundToInt()}%"
+            ))
         }
+    }
+
+    @EventListener
+    @Async
+    open fun onRestartEvent(event: RobotRestartEvent) {
+        if (adminChatId == null) {
+            LOG.info("Do nothing on restart event because adminChatId is not set")
+            return
+        }
+        telegramBot.execute(SendMessage(adminChatId, "Connections issue. Robot listener was restarted"))
+    }
+
+    @EventListener
+    @Async
+    open fun onRestartEvent(event: RobotStartEvent) {
+        if (adminChatId == null) {
+            LOG.info("Do nothing on start event because adminChatId is not set")
+            return
+        }
+        telegramBot.execute(SendMessage(adminChatId, "Robot has started"))
     }
 }

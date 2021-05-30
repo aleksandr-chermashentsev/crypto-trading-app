@@ -8,6 +8,8 @@ package tradenotifier;
 
 service TradeNotifier {
   rpc Trade (RobotTradeEvent) returns (EventResponse) {}
+  rpc Restart (RobotRestartEvent) returns (Empty) {}
+  rpc Start (RobotStartEvent) returns (Empty) {}
 }
 
 service RobotStateService {
@@ -76,3 +78,6 @@ message ClosePositionsMsg {
 message ClosePositionsResponse {
   bool success = 1;
 }
+
+message RobotRestartEvent {}
+message RobotStartEvent {}

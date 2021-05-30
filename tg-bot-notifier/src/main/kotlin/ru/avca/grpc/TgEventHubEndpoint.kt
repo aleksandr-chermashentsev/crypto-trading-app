@@ -3,9 +3,7 @@ package ru.avca.grpc
 import io.grpc.stub.StreamObserver
 import io.micronaut.context.annotation.Context
 import io.micronaut.context.event.ApplicationEventPublisher
-import ru.avca.grpcservices.EventResponse
-import ru.avca.grpcservices.RobotTradeEvent
-import ru.avca.grpcservices.TradeNotifierGrpc
+import ru.avca.grpcservices.*
 import javax.inject.Inject
 
 /**
@@ -25,6 +23,20 @@ class TgEventHubEndpoint(
             .setIsHandled(true)
             .build()
         )
+        responseObserver?.onCompleted()
+    }
+
+    override fun restart(request: RobotRestartEvent?, responseObserver: StreamObserver<Empty>?) {
+        request!!
+        eventPublisher.publishEvent(request)
+        responseObserver?.onNext(Empty.getDefaultInstance())
+        responseObserver?.onCompleted()
+    }
+
+    override fun start(request: RobotStartEvent?, responseObserver: StreamObserver<Empty>?) {
+        request!!
+        eventPublisher.publishEvent(request)
+        responseObserver?.onNext(Empty.getDefaultInstance())
         responseObserver?.onCompleted()
     }
 }

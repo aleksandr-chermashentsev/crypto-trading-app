@@ -6,9 +6,8 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.avca.grpcservices.EventResponse;
-import ru.avca.grpcservices.RobotTradeEvent;
-import ru.avca.grpcservices.TradeNotifierGrpc;
+import ru.avca.grpcservices.*;
+import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.event.RobotEvents;
 
 import javax.inject.Inject;
@@ -20,8 +19,8 @@ import java.util.concurrent.ExecutionException;
  * Date: 19.04.2021
  **/
 @Context
-public class TradeNotifierService {
-    private static final Logger LOG = LoggerFactory.getLogger(TradeNotifierService.class);
+public class EventsNotifierService {
+    private static final Logger LOG = LoggerFactory.getLogger(EventsNotifierService.class);
     @Inject @Named("tg-bot-notifier") private TradeNotifierGrpc.TradeNotifierFutureStub tgBotNotifier;
     @Inject @Named("database-persist") private TradeNotifierGrpc.TradeNotifierFutureStub databasePersist;
 
@@ -45,5 +44,17 @@ public class TradeNotifierService {
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Got error during buy event", e);
         }
+    }
+
+    @EventListener
+    @Async
+    public void sendRestartEvent(CandlestickEvents.RestartListenCandlesticksEvent event) {
+        tgBotNotifier.restart(RobotRestartEvent.getDefaultInstance());
+    }
+
+    @EventListener
+    @Async
+    public void sendStartEvent(CandlestickEvents.StartListenCandlesticksEvent startListenCandlesticksEvent) {
+        tgBotNotifier.start(RobotStartEvent.getDefaultInstance());
     }
 }
