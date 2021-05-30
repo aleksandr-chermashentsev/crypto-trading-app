@@ -20,8 +20,7 @@ spec:
         - name: "database-persist"
           image: "gcr.io/crypto-stock-app-310819/database-persist:0.101"
           resources:
-            limits:
-              memory: "64Mi"
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8081
@@ -43,6 +42,7 @@ spec:
               name: db-storage
         - name: "tg-bot-notifier"
           image: "gcr.io/crypto-stock-app-310819/tg-bot-notifier:0.101"
+          imagePullPolicy: Always
           env:
             - name: telegram.token
               valueFrom:
@@ -63,14 +63,13 @@ spec:
             - name: http
               containerPort: 8082
           resources:
-            limits:
-              memory: "64Mi"
           readinessProbe:
             httpGet:
               path: /health/readiness
               port: 8082
             initialDelaySeconds: 5
             timeoutSeconds: 3
+
           livenessProbe:
             httpGet:
               path: /health/liveness
@@ -81,8 +80,6 @@ spec:
         - name: "robot-impl"
           image: "gcr.io/crypto-stock-app-310819/robot-impl:0.101"
           resources:
-            limits:
-              memory: "128Mi"
           env:
             - name: exchange.binance.api.secret
               valueFrom:
@@ -98,6 +95,7 @@ spec:
             - name: config
               mountPath: "/home/app/resources/prod"
               readOnly: false
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8083

@@ -35,7 +35,7 @@ data:
       usdCoin: USDT
       interval: TWELVE_HOURLY
       stopLoss: 0.01
-      takeProfit: 3
+      takeProfit: 1.35
       coinsCount: 1
       initialBalance: 30
 

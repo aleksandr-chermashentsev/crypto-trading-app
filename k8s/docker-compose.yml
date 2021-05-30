@@ -1,0 +1,13 @@
+services:
+  consul:
+    image: "consul:latest"
+    ports:
+      - "8500:8500"
+  database-persist:
+    image: "gcr.io/crypto-stock-app-310819/database-persist:0.101"
+    ports:
+      - "8081:8081"
+  tg-bot-notifier:
+    image: "gcr.io/crypto-stock-app-310819/tg-bot-notifier:0.101"
+volumes:
+  logvolume01: {}

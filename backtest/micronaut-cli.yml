@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: ru.avca
+testFramework: spock
+sourceLanguage: kotlin
+buildTool: gradle
+features: [ annotation-api, app-name, gradle, h2, http-client, kotlin, kotlin-application, log4j2, netty-server, readme, shade, spock, yaml ]

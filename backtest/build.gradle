@@ -1,0 +1,71 @@
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "1.4.32"
+    id("groovy")
+    id("org.jetbrains.kotlin.kapt") version "1.4.32"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("io.micronaut.application") version "1.5.0"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.32"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.4.32"
+
+}
+
+version = "0.1"
+group = "ru.avca"
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("ru.avca.*")
+    }
+}
+
+dependencies {
+    kapt("io.micronaut.data:micronaut-data-processor")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-runtime")
+    runtime("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+    implementation("javax.annotation:javax.annotation-api")
+    implementation("org.apache.logging.log4j:log4j-core:2.13.3")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("com.github.binance-exchange:binance-java-api:-SNAPSHOT")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.apache.logging.log4j:log4j-api:2.13.3")
+    runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
+    implementation("io.micronaut:micronaut-validation")
+
+    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+}
+
+
+application {
+    mainClass.set("ru.avca.ApplicationKt")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("11")
+}
+
+tasks {
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+
+
+}
