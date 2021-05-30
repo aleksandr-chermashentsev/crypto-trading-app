@@ -66,7 +66,7 @@ open class TgBotImpl(
             val price = event.quoteQty / event.baseQty
             telegramBot.execute(SendMessage(adminChatId,
                 "${event.symbol} was bought\n" +
-                        "💵 USDT quantity ${event.quoteQty}" +
+                        "💵 USDT quantity ${event.quoteQty}\n" +
                         "🗑 Slippage is ${((1 - price / event.expectedPrice) * 100).roundToInt()}%"
             ))
         }
