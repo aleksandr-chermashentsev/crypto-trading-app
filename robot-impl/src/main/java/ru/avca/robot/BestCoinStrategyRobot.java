@@ -196,6 +196,7 @@ public class BestCoinStrategyRobot {
         if (newSymbols.size() > 0) {
             LOG.info("Subscribe on new symbols {}", newSymbols);
             subscribeOnSymbols(newSymbols, startEvent.getInterval());
+            updateStepSizes(startEvent);
         }
     }
 
