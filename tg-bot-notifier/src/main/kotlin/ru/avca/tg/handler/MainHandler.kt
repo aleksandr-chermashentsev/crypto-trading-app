@@ -50,7 +50,8 @@ class MainHandler(
 
 
     override fun handle(update: Update): TgHandler {
-        val tgHandler = handlers[update.message().text()]
+        val message = update.message() ?: return this
+        val tgHandler = handlers[message.text()]
         return tgHandler?.handle(update) ?: handlers["/help"]!!.handle(update)
     }
 }
