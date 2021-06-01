@@ -102,7 +102,7 @@ open class TgBotImpl(
         }
         if (event.openPositionsUsdtBalance <= 0) {
             telegramBot.execute(SendMessage(adminChatId,
-                "All positions closed, current balance is $event.currentUsdtBalance"
+                "All positions closed, current balance is ${event.openPositionsUsdtBalance}"
             ))
             return
         }
@@ -112,7 +112,7 @@ open class TgBotImpl(
         }
 
         telegramBot.execute(SendMessage(adminChatId,
-            "$rocketSign Current balance is $event.currentUsdtBalance, old balance is $event.usdtBalance"
+            "$rocketSign Current balance is ${event.openPositionsUsdtBalance}, old balance is ${event.oldUsdtBalance}"
         ))
     }
 }
