@@ -10,6 +10,7 @@ import io.micronaut.runtime.event.annotation.EventListener
 import io.micronaut.scheduling.annotation.Async
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import ru.avca.grpcservices.ProfitInfo
 import ru.avca.grpcservices.RobotRestartEvent
 import ru.avca.grpcservices.RobotStartEvent
 import ru.avca.grpcservices.RobotTradeEvent
@@ -90,5 +91,28 @@ open class TgBotImpl(
             return
         }
         telegramBot.execute(SendMessage(adminChatId, "Robot has started"))
+    }
+
+    @EventListener
+    @Async
+    open fun onOpenPositionInfo(event: ProfitInfo) {
+        if (adminChatId == null) {
+            LOG.info("Do nothing on start event because adminChatId is not set")
+            return
+        }
+        if (event.openPositionsUsdtBalance <= 0) {
+            telegramBot.execute(SendMessage(adminChatId,
+                "All positions closed, current balance is $event.currentUsdtBalance"
+            ))
+            return
+        }
+        var rocketSign = "\uD83D\uDE80"//🚀
+        if (event.oldUsdtBalance > event.openPositionsUsdtBalance) {
+            rocketSign = "\uD83D\uDCC9"//📉
+        }
+
+        telegramBot.execute(SendMessage(adminChatId,
+            "$rocketSign Current balance is $event.currentUsdtBalance, old balance is $event.usdtBalance"
+        ))
     }
 }

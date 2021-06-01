@@ -18,6 +18,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.TaskScheduler;
 import io.micronaut.scheduling.annotation.Async;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.robot.event.CandlestickEvents;
@@ -269,7 +270,7 @@ public class BestCoinStrategyRobot {
 
         } catch (Exception e) {
             if (e instanceof BinanceApiException) {
-                LOG.error("Code error {}", ((BinanceApiException)e).getError().getCode());
+                LOG.error("Code error {}", ((BinanceApiException) e).getError().getCode());
             }
             LOG.error("Can't open position. Rejected order {}", order, e);
         }
@@ -290,5 +291,17 @@ public class BestCoinStrategyRobot {
             newUsdtBalance = newBalance;
         }
         LOG.info("Usdt balance updated. {}", newBalance);
+    }
+
+    public Pair<BigDecimal, BigDecimal> getProfitInfo() {
+        return Pair.of(
+                currentUsdtBalance,
+                openPositionInfosBySymbol.entrySet().stream()
+                        .map(symbolToOpenPositionInfo -> {
+                            CandlestickEvent currentState = candles.get(symbolToOpenPositionInfo.getKey());
+                            return new BigDecimal(currentState.getClose()).multiply(symbolToOpenPositionInfo.getValue().getBalance());
+                        })
+                        .reduce(new BigDecimal(0), BigDecimal::add)
+        );
     }
 }

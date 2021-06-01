@@ -3,6 +3,7 @@ package ru.avca.robot.grpc;
 import io.grpc.stub.StreamObserver;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.grpcservices.*;
@@ -54,6 +55,22 @@ public class RobotManagerEndpoint extends RobotStateManagerGrpc.RobotStateManage
             responseObserver.onNext(SetUsdBalanceResponse.newBuilder().setSuccess(true).build());
         } catch (Exception e) {
             responseObserver.onNext(SetUsdBalanceResponse.newBuilder().setSuccess(false).build());
+        }
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getCurrentProfit(Empty request, StreamObserver<ProfitInfo> responseObserver) {
+        try {
+            ProfitInfo.Builder builder = ProfitInfo.newBuilder();
+            Pair<BigDecimal, BigDecimal> profitInfo = robot.getProfitInfo();
+            responseObserver.onNext(builder
+                    .setOldUsdtBalance(profitInfo.getKey().doubleValue())
+                    .setOpenPositionsUsdtBalance(profitInfo.getValue().doubleValue())
+                    .build()
+            );
+        } catch (Exception e) {
+            responseObserver.onNext(ProfitInfo.getDefaultInstance());
         }
         responseObserver.onCompleted();
     }

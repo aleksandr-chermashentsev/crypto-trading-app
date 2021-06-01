@@ -22,6 +22,7 @@ service RobotStateService {
 service RobotStateManager {
   rpc ClosePositions (ClosePositionsMsg) returns (ClosePositionsResponse);
   rpc SetUsdBalance (SetUsdBalanceMsg) returns (SetUsdBalanceResponse);
+  rpc GetCurrentProfit (Empty) returns (ProfitInfo);
 }
 
 message OpenPositionsMsg {
@@ -81,3 +82,8 @@ message ClosePositionsResponse {
 
 message RobotRestartEvent {}
 message RobotStartEvent {}
+
+message ProfitInfo {
+  double oldUsdtBalance = 1;
+  double openPositionsUsdtBalance = 2;
+}

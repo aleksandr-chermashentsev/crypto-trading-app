@@ -24,7 +24,8 @@ class HelpHandler(
             SendMessage(
                 update.message().chat().id(),
                 "💵 in order to change usd balance send /changeUsd\n" +
-                    "🚏 in order to close all current positions send /closePositions"
+                    "🚏 in order to close all current positions send /closePositions\n" +
+                        "\uD83D\uDCA1 in order to know your current state send /getProfitInfo"
             )
         )
         return mainHandler

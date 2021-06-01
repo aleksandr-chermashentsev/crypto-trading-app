@@ -6,6 +6,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.context.event.StartupEvent
 import io.micronaut.runtime.event.annotation.EventListener
 import ru.avca.TgHandler
+import ru.avca.grpcservices.RobotStateManagerGrpc
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class MainHandler(
     @Inject val tgBot: TelegramBot,
-    @Inject val applicationContext: ApplicationContext
+    @Inject val applicationContext: ApplicationContext,
+    @Inject val stub: RobotStateManagerGrpc.RobotStateManagerBlockingStub
 ) : TgHandler {
 
     lateinit var changeUsdHandler: ChangeUsdHandler
@@ -36,6 +38,11 @@ class MainHandler(
                 "Submit your new usd balance. Use . as delimiter if you want to specify fractional part.",
                 changeUsdHandler,
                 tgBot
+            ),
+            "/getProfitInfo" to GetCurrentProfitInfoHandler(
+                tgBot,
+                stub,
+                this
             ),
             "/closePositions" to closePositionsHandler
         )
