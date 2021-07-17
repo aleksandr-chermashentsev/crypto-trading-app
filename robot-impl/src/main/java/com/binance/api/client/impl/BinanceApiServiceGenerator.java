@@ -7,7 +7,7 @@ import com.binance.api.client.security.AuthenticationInterceptor;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import retrofit2.Call;
 import retrofit2.Converter;
 import retrofit2.Response;
