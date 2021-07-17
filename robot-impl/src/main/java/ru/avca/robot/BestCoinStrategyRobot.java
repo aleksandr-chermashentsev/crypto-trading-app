@@ -211,26 +211,30 @@ public class BestCoinStrategyRobot {
                 );
         LOG.info("Try to close {}", expectedQuantities);
         HashMap<String, Boolean> result = new HashMap<>();
-        expectedQuantities.forEach((symbol, expectedQty) -> {
-            NewOrder newOrder = new NewOrder(
-                    symbol,
-                    OrderSide.SELL,
-                    OrderType.MARKET,
-                    null,
-                    expectedQty.stripTrailingZeros().toPlainString()
-            );
-            openPositionInfosBySymbol.remove(symbol);
-            NewOrderResponse response = binanceApiClientFactory.newRestClient().newOrder(newOrder);
-            LOG.error("Close position response {}", response);
-            currentUsdtBalance = new BigDecimal(response.getCummulativeQuoteQty());
-            if (newUsdtBalance != null) {
-                currentUsdtBalance = newUsdtBalance;
-                newUsdtBalance = null;
-            }
-            publisher.publishEvent(new RobotEvents.SellEvent(symbol, currentUsdtBalance));
-            LOG.info("Current usdt balance {}", currentUsdtBalance);
-            result.put(symbol, true);
-        });
+        try {
+            expectedQuantities.forEach((symbol, expectedQty) -> {
+                NewOrder newOrder = new NewOrder(
+                        symbol,
+                        OrderSide.SELL,
+                        OrderType.MARKET,
+                        null,
+                        expectedQty.stripTrailingZeros().toPlainString()
+                );
+                openPositionInfosBySymbol.remove(symbol);
+                NewOrderResponse response = binanceApiClientFactory.newRestClient().newOrder(newOrder);
+                LOG.error("Close position response {}", response);
+                currentUsdtBalance = new BigDecimal(response.getCummulativeQuoteQty());
+                if (newUsdtBalance != null) {
+                    currentUsdtBalance = newUsdtBalance;
+                    newUsdtBalance = null;
+                }
+                publisher.publishEvent(new RobotEvents.SellEvent(symbol, currentUsdtBalance));
+                LOG.info("Current usdt balance {}", currentUsdtBalance);
+                result.put(symbol, true);
+            });
+        } catch (Exception e) {
+            LOG.error("Exception on close position", e);
+        }
 
         openPositionInfosBySymbol.clear();
         robotStateService.saveOpenPositions(Stream.empty());
