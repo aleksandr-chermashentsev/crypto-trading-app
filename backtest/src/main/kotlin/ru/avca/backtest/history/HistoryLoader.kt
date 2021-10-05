@@ -22,12 +22,12 @@ class HistoryLoader(
     @Inject val candlestickRepository: CandlestickRepository
 ) {
     private val LOG: Logger = LoggerFactory.getLogger(HistoryLoader::class.java)
-    fun loadHistory(symbol:String, interval: CandlestickInterval, fromTimestamp:Long): Stream<Candlestick> {
+    fun loadHistory(symbol:String, interval: CandlestickInterval, fromTimestamp:Long, toTimestamp: Long): Stream<Candlestick> {
         val fromDb = candlestickRepository.getAllFromTimestamp(symbol, interval, fromTimestamp)
             .toList()
         if (fromDb.isEmpty()) {
             LOG.info("Could not find $symbol $interval $fromTimestamp in db so load it from binance")
-            return binanceHistoryLoader.loadHistory(symbol, interval, fromTimestamp)
+            return binanceHistoryLoader.loadHistory(symbol, interval, fromTimestamp, toTimestamp)
                 .peek {candlestickRepository.save(it.toEntity(it, symbol, interval, fromTimestamp))}
                 .toList()
                 .stream()

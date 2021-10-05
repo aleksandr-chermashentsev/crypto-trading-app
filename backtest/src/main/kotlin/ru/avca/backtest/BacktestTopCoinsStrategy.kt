@@ -9,6 +9,7 @@ import io.micronaut.runtime.event.annotation.EventListener
 import ru.avca.backtest.history.HistoryLoader
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -28,7 +29,7 @@ open class BacktestTopCoinsStrategy(
     @Inject val historyLoader: HistoryLoader
 ) {
 
-    @EventListener
+//    @EventListener
     fun onStartupEvent(startupEvent: StartupEvent) {
         val symbols = restClient.exchangeInfo.symbols.stream()
             .filter { it.quoteAsset == "USDT" }
@@ -37,11 +38,11 @@ open class BacktestTopCoinsStrategy(
 //            .filter {(it.endsWith("UPUSDT", ignoreCase = true) || it.endsWith("DOWNUSDT", ignoreCase = true))}
             .toList()
         val executor = Executors.newFixedThreadPool(3)
-        val timestampFrom = Utils.timestampOfTheDate("2019-01-01")
+        val timestampFrom = Utils.timestampOfTheDate("2021-08-01")
         val results: MutableMap<ResultKey, BigDecimal> = ConcurrentHashMap()
 
         val btcUsdtDailyMap =
-            historyLoader.loadHistory("BTCUSDT", CandlestickInterval.DAILY, Utils.timestampOfTheDate("2017-01-01"))
+            historyLoader.loadHistory("BTCUSDT", CandlestickInterval.DAILY, Utils.timestampOfTheDate("2017-01-01"), Instant.now().toEpochMilli())
                 .map {
                    it.openTime to it
                 }
@@ -52,17 +53,17 @@ open class BacktestTopCoinsStrategy(
 //            CandlestickInterval.MONTHLY,
 //            CandlestickInterval.WEEKLY,
 //            CandlestickInterval.THREE_DAILY,
-//            CandlestickInterval.DAILY,
+            CandlestickInterval.DAILY,
             CandlestickInterval.TWELVE_HOURLY,
-//            CandlestickInterval.EIGHT_HOURLY,
-//            CandlestickInterval.SIX_HOURLY,
+            CandlestickInterval.EIGHT_HOURLY,
+            CandlestickInterval.SIX_HOURLY,
 //            CandlestickInterval.FOUR_HOURLY,
 //            CandlestickInterval.TWO_HOURLY,
 //            CandlestickInterval.HOURLY
         )) {
             val candlesBySymbol =
-                symbols.associateWith { historyLoader.loadHistory(it, interval, timestampFrom).toList() }
-            for (coinsCount in arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) {
+                symbols.associateWith { historyLoader.loadHistory(it, interval, timestampFrom, Instant.now().toEpochMilli()).toList() }
+            for (coinsCount in arrayOf(1, 2, /*3, 4, 5, 6, 7, 8, 9, 10*/)) {
                 for (stopLoss in 0..9)
                 {
                     val tpValues = 105..200 step 10
@@ -164,7 +165,7 @@ open class BacktestTopCoinsStrategy(
                 val weekInMilliseconds = TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS)
                 val startWeekCandle = btcUsdtDaylyMap.floorEntry(openTime - weekInMilliseconds).value
                 val endWeekCandle = btcUsdtDaylyMap.floorEntry(openTime).value
-                if (BigDecimal(startWeekCandle.open).toDouble() < BigDecimal(endWeekCandle.close).toDouble()) {
+//                if (BigDecimal(startWeekCandle.open).toDouble() < BigDecimal(endWeekCandle.close).toDouble()) {
                     if (buyCoins(
                             currentBest,
                             candlesWithSymbolsForCurrentTime,
@@ -173,7 +174,7 @@ open class BacktestTopCoinsStrategy(
                             usdtBalance
                         )
                     ) return usdtBalance
-                }
+//                }
             }
         }
         return usdtBalance
@@ -213,7 +214,7 @@ open class BacktestTopCoinsStrategy(
             }.toList())
         }
 
-        if (usdtBalance.toDouble() < 20) {
+        if (usdtBalance.toDouble() < 10) {
             return true
         }
         return false

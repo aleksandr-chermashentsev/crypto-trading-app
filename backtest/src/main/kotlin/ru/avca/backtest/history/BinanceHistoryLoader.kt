@@ -20,14 +20,13 @@ import javax.inject.Singleton
 class BinanceHistoryLoader(
     @Inject val asyncRestClient: BinanceApiAsyncRestClient
 ) {
-    fun loadHistory(symbol:String, interval:CandlestickInterval, fromTimestamp:Long):Stream<Candlestick> {
+    fun loadHistory(symbol:String, interval:CandlestickInterval, fromTimestamp:Long, toTimestamp: Long = Date().time):Stream<Candlestick> {
 
-        val now = Date()
         val result: TreeSet<Candlestick> =
             TreeSet<Candlestick>(Comparator.comparingLong { it.openTime })
         var currentFromTimestamp = fromTimestamp;
-        while (now.time - currentFromTimestamp >= interval.timeInMillis()) {
-            result.addAll(loadHistoryImpl(symbol, interval, currentFromTimestamp, now.time))
+        while (toTimestamp - currentFromTimestamp >= interval.timeInMillis()) {
+            result.addAll(loadHistoryImpl(symbol, interval, currentFromTimestamp, toTimestamp))
             if (result.isEmpty() || result.last().closeTime == currentFromTimestamp) {
                 return Stream.empty()
             }

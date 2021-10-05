@@ -5,6 +5,7 @@ import com.binance.api.client.domain.general.SymbolStatus
 import com.binance.api.client.domain.market.CandlestickInterval.*
 import io.micronaut.context.event.StartupEvent
 import ru.avca.backtest.history.HistoryLoader
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import javax.inject.Inject
@@ -35,7 +36,7 @@ open class Runner(
                 .filter { it.status == SymbolStatus.TRADING }
                 .map { it.symbol }
                 .forEach { symbol ->
-                    val count = historyLoader.loadHistory(symbol, interval, fromTimestamp).count()
+                    val count = historyLoader.loadHistory(symbol, interval, fromTimestamp, Instant.now().toEpochMilli()).count()
                     println("Loaded $count entries for $symbol in interval $interval")
                 }
         }
