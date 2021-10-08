@@ -21,8 +21,12 @@ public class RobotStateService {
 
     @Inject private RobotStateServiceGrpc.RobotStateServiceBlockingStub robotStateServiceBlockingStub;
 
-    public Map<String, OpenPositionInfo> loadAllOpenPositionInfos() {
-        OpenPositionsMsg allOpenPositions = robotStateServiceBlockingStub.getAllOpenPositions(Empty.getDefaultInstance());
+    public Map<String, OpenPositionInfo> loadAllOpenPositionInfos(String robotName) {
+        OpenPositionsMsg allOpenPositions = robotStateServiceBlockingStub.getAllOpenPositions(
+                RobotName.newBuilder()
+                        .setRobotName(robotName)
+                        .build()
+        );
         return allOpenPositions.getOpenPositionsList().stream()
                 .collect(Collectors.toMap(
                         OpenPositionMsg::getSymbol,

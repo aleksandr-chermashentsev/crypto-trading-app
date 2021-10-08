@@ -14,7 +14,7 @@ service TradeNotifier {
 
 service RobotStateService {
   rpc UpdateOpenPositions (OpenPositionsMsg) returns (Empty);
-  rpc GetAllOpenPositions (Empty) returns (OpenPositionsMsg);
+  rpc GetAllOpenPositions (RobotName) returns (OpenPositionsMsg);
   rpc SaveCurrencyBalance (CurrencyBalanceMsg) returns (Empty);
   rpc GetAllCurrencyBalance (Empty) returns (CurrencyBalancesMsg);
 }
@@ -33,6 +33,11 @@ message OpenPositionMsg {
   string symbol = 1;
   string price = 2;
   string balance = 3;
+  string robotName = 4;
+}
+
+message RobotName {
+  string robotName = 1;
 }
 
 message CurrencyBalancesMsg {

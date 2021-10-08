@@ -58,17 +58,17 @@ class DatabasePersistTest(
 
     "test openPositionRepository should remove all prev positions before save new one" {
         val openPositionDomains1 = listOf(
-            OpenPositionDomain("test1", "123", "456"),
-            OpenPositionDomain("test2", "123", "567")
+            OpenPositionDomain("test1", "123", "456", "robot"),
+            OpenPositionDomain("test2", "123", "567", "robot")
         )
 
         val openPositionDomains2 = listOf(
-            OpenPositionDomain("test3", "4848", "9499"),
-            OpenPositionDomain("test4", "4020", "1038")
+            OpenPositionDomain("test3", "4848", "9499", "robot"),
+            OpenPositionDomain("test4", "4020", "1038", "robot")
         )
 
         openPositionRepository.updateOpenPositions(openPositionDomains1)
-        var savedDomains = openPositionRepository.getAllOpenPositions()
+        var savedDomains = openPositionRepository.getAllOpenPositions("robot")
             .sorted(compareBy {it.symbol})
             .collect(toList())
 
@@ -76,7 +76,7 @@ class DatabasePersistTest(
         savedDomains shouldBe openPositionDomains1
 
         openPositionRepository.updateOpenPositions(openPositionDomains2)
-        savedDomains = openPositionRepository.getAllOpenPositions()
+        savedDomains = openPositionRepository.getAllOpenPositions("robot")
             .sorted(compareBy {it.symbol})
             .collect(toList())
 

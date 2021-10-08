@@ -11,7 +11,6 @@ import com.binance.api.client.domain.general.SymbolInfo;
 import com.binance.api.client.domain.general.SymbolStatus;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.exception.BinanceApiException;
-import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -45,7 +44,7 @@ import static ru.avca.robot.utils.TimeUtils.getCurrentTimeUtc;
  * @author a.chermashentsev
  * Date: 08.04.2021
  **/
-@Context
+//@Context
 public class BestCoinStrategyRobot {
     private static final Logger LOG = LoggerFactory.getLogger(BestCoinStrategyRobot.class);
     private final AtomicBoolean isStarted = new AtomicBoolean(false);

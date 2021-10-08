@@ -17,11 +17,12 @@ open class OpenPositionRepositoryImpl(
     override fun updateOpenPositions(newPositions: List<OpenPositionDomain>) {
         em.createQuery("delete from OpenPositionDomain ")
             .executeUpdate()
-        newPositions.forEach { em.persist(OpenPositionDomain(it.symbol, it.price, it.balance)) }
+        newPositions.forEach { em.persist(OpenPositionDomain(it.symbol, it.price, it.balance, it.robotName)) }
     }
 
-    override fun getAllOpenPositions(): Stream<OpenPositionDomain> {
-        return em.createQuery("select op from OpenPositionDomain op", OpenPositionDomain::class.java)
+    override fun getAllOpenPositions(robotName: String): Stream<OpenPositionDomain> {
+        return em.createQuery("select op from OpenPositionDomain op where op.robotName=:robotName", OpenPositionDomain::class.java)
+            .setParameter("robotName", robotName)
             .resultList
             .stream()
     }

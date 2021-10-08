@@ -23,7 +23,7 @@ class RobotStateServiceEndpoint(
     override fun updateOpenPositions(request: OpenPositionsMsg?, responseObserver: StreamObserver<Empty>?) {
         request!!
         val newPositions = request.openPositionsList.stream()
-            .map { OpenPositionDomain(it.symbol, it.price, it.balance) }
+            .map { OpenPositionDomain(it.symbol, it.price, it.balance, it.robotName) }
             .collect(toList())
         openPositionRepository.updateOpenPositions(newPositions)
 
@@ -31,8 +31,8 @@ class RobotStateServiceEndpoint(
         responseObserver?.onCompleted()
     }
 
-    override fun getAllOpenPositions(request: Empty?, responseObserver: StreamObserver<OpenPositionsMsg>?) {
-        val positions = openPositionRepository.getAllOpenPositions()
+    override fun getAllOpenPositions(request: RobotName?, responseObserver: StreamObserver<OpenPositionsMsg>?) {
+        val positions = openPositionRepository.getAllOpenPositions(request!!.robotName)
             .map {
                 OpenPositionMsg.newBuilder()
                     .setBalance(it.balance)

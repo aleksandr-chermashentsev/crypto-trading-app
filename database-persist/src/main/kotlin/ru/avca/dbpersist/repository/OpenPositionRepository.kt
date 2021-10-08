@@ -12,5 +12,5 @@ interface OpenPositionRepository {
 
     fun updateOpenPositions(newPositions: List<OpenPositionDomain>)
 
-    fun getAllOpenPositions(): Stream<OpenPositionDomain>
+    fun getAllOpenPositions(robotName: String): Stream<OpenPositionDomain>
 }

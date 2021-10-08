@@ -15,7 +15,8 @@ class OpenPositionDomain(
     @Id
     val symbol: String,
     val price: String,
-    val balance: String
+    val balance: String,
+    val robotName: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
