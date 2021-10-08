@@ -66,8 +66,8 @@ public class CandlestickListener {
     }
 
     private void restartListener(ListenerKey key) {
-        CountDownLatch countDownLatch = latches.get(key);
-        countDownLatch.countDown();
+        stopListenToCandlestick(key);
+        startListenToCandlestick(key);
     }
 
     private void startListenToCandlestick(ListenerKey key) {
@@ -95,7 +95,7 @@ public class CandlestickListener {
                 @Override
                 public void onResponse(CandlestickEvent event) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Got new event {} ", event);
+                        LOG.info("Got new event {} ", event);
                     }
                     eventPublisher.publishEventAsync(new BinanceCandlestickEvent(event, key));
                 }
