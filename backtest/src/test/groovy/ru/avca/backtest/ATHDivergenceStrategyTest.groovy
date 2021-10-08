@@ -70,23 +70,23 @@ class ATHDivergenceStrategyTest extends Specification {
         ]
     }
 
-    def "should buy more if go throw loss price and have 2 trades"() {
+    def "should sell if go throw loss price and have 2 trades"() {
         when:
         def strategy = createNewStrategy(['periodLength': 2, 'athDeviationPercent': 0.8D, 'partOfUsdBalanceUse': 0.5, 'increasePositionPercent': 0.9, 'lossPricePercent': 0.85])
         def ticks = [
-                ["BTCUSDT": createCandlestick(high: 100, low: 90)] as HashMap,
+                ["BTCUSDT": createCandlestick(high: 100, low: 80)] as HashMap,
         ]
 
         then:
         ticks.collect {strategy.onTimeTick(it, createContext(
                 1000, ["BTCUSDT": new Balance('BTCUSDT', 5, 100, 2)]
         ), createAthValues("BTCUSDT": 100))} == [
-                [new BacktestStrategyOperation("BTCUSDT", OperationSide.BUY, 500D/2/90, 100D*0.9D)]
+                [new BacktestStrategyOperation("BTCUSDT", OperationSide.SELL, 5, 85)]
         ]
     }
 
 
-    def "should sell if go throw loss price twice"() {
+    def "should buy if go throw increasePositionPrice"() {
         when:
         def strategy = createNewStrategy(['periodLength': 2, 'athDeviationPercent': 0.8D, 'partOfUsdBalanceUse': 0.5, 'increasePositionPercent': 0.9, 'lossPricePercent': 0.80])
         def ticks = [
@@ -97,7 +97,7 @@ class ATHDivergenceStrategyTest extends Specification {
         ticks.collect {strategy.onTimeTick(it, createContext(
                 1000, ["BTCUSDT": new Balance('BTCUSDT', 5, 100, 1)]
         ), createAthValues("BTCUSDT": 100))} == [
-                [new BacktestStrategyOperation("BTCUSDT", OperationSide.SELL, 5, 100D*0.8D)]
+                [new BacktestStrategyOperation("BTCUSDT", OperationSide.BUY, 500D/2/90, 90D)]
         ]
     }
 
