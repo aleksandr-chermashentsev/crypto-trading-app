@@ -25,12 +25,23 @@ grpc:
     max-inbound-message-size: 1024
 
 robot:
+  enabled: false
   usdCoin: USDT
   interval: TWELVE_HOURLY
   stopLoss: 0.3
   takeProfit: 2
   coinsCount: 1
   initialBalance: 25
+
+subscription:
+  quoteFilter: USDT
+  candlestickIntervals: [ONE_MINUTE]
+  updateIntervalSec: 30
+athDevergenceRobotConfig:
+  robotName: ath-robot-1
+  usdCoin: USDT
+  interval: ONE_MINUTE
+  periodLength: 10
 
 endpoints:
   health:
