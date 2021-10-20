@@ -43,6 +43,7 @@ public class SubscriptionComponent {
     @Async
     public void onStart(StartupEvent event) {
         String subscribeString = getSymbolsStream()
+                .map(String::toLowerCase)
                 .peek(subscribedSymbols::add)
                 .collect(Collectors.joining(","));
         LOG.info("Send subscribe string {}", subscribeString);

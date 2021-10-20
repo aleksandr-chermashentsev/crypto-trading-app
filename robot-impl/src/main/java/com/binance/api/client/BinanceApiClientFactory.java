@@ -64,30 +64,9 @@ public class BinanceApiClientFactory {
     }
 
     /**
-     * Creates a new asynchronous/non-blocking Margin REST client.
-     */
-    public BinanceApiAsyncMarginRestClient newAsyncMarginRestClient() {
-        return new BinanceApiAsyncMarginRestClientImpl(apiKey, secret);
-    }
-
-    /**
-     * Creates a new synchronous/blocking Margin REST client.
-     */
-    public BinanceApiMarginRestClient newMarginRestClient() {
-        return new BinanceApiMarginRestClientImpl(apiKey, secret);
-    }
-
-    /**
      * Creates a new web socket client used for handling data streams.
      */
     public BinanceApiWebSocketClient newWebSocketClient() {
         return new BinanceApiWebSocketClientImpl(BinanceApiServiceGenerator.createOkHttpClient());
-    }
-
-    /**
-     * Creates a new synchronous/blocking Swap REST client.
-     */
-    public BinanceApiSwapRestClient newSwapRestClient() {
-        return new BinanceApiSwapRestClientImpl(apiKey, secret);
     }
 }
