@@ -45,6 +45,23 @@ public class EventsNotifierService {
             LOG.error("Got error during buy event", e);
         }
     }
+    @EventListener
+    @Async
+    public void sendSellEvent(RobotEvents.SellEvent event) {
+        RobotTradeEvent tradeEvent = RobotTradeEvent.newBuilder()
+                .setSymbol(event.getSymbol())
+                .setQuoteQty(event.getUsdBalance().doubleValue())
+                .setSide(RobotTradeEvent.TradeSide.SELL)
+                .build();
+        ListenableFuture<EventResponse> tgResponseFuture = tgBotNotifier.trade(tradeEvent);
+
+        try {
+            LOG.info("Send BuyEvent to telegram. Got Response {}", tgResponseFuture.get());
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("Got error during buy event", e);
+        }
+
+    }
 
     @EventListener
     @Async

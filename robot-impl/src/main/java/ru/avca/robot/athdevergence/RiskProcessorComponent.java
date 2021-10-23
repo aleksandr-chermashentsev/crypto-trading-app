@@ -126,6 +126,7 @@ public class RiskProcessorComponent {
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
         unlockFeature.cancel(true);
         buyLock.unlock();
+        eventPublisher.publishEventAsync(buyEvent);
     }
 
     private void onSell(RobotEvents.SellEvent sellEvent) {
@@ -134,5 +135,6 @@ public class RiskProcessorComponent {
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
         unlockFeature.cancel(true);
         buyLock.unlock();
+        eventPublisher.publishEventAsync(sellEvent);
     }
 }

@@ -59,6 +59,7 @@ open class TgBotImpl(
     @EventListener
     @Async
     open fun onTradeEvent(event: RobotTradeEvent) {
+        LOG.info("got event $event")
         if (adminChatId == null) {
             LOG.info("Do nothing on trade event because adminChatId is not set")
             return
@@ -70,6 +71,14 @@ open class TgBotImpl(
                         "💵 USDT quantity ${event.quoteQty}\n" +
                         "🗑 Slippage is ${((1 - price / event.expectedPrice) * 100).roundToInt()}%"
             ))
+        }
+        else {
+            telegramBot.execute(
+                SendMessage(adminChatId,
+                    "${event.symbol} sell\n" +
+                            "💵 USDT quantity ${event.quoteQty}\n"
+                )
+            )
         }
     }
 
