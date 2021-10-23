@@ -17,7 +17,7 @@ open class OpenPositionRepositoryImpl(
     override fun updateOpenPositions(newPositions: List<OpenPositionDomain>) {
         em.createQuery("delete from OpenPositionDomain ")
             .executeUpdate()
-        newPositions.forEach { em.persist(OpenPositionDomain(it.symbol, it.price, it.balance, it.robotName)) }
+        newPositions.forEach { em.persist(it) }
     }
 
     override fun getAllOpenPositions(robotName: String): Stream<OpenPositionDomain> {

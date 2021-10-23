@@ -21,7 +21,6 @@ import java.util.AbstractCollection;
 import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 
 /**
  * @author a.chermashentsev
@@ -44,7 +43,7 @@ public class ATHValuesSignalProcessor {
         String symbol = binanceEvent.getSymbol();
         BigDecimal lastEventHighPrice = new BigDecimal(binanceEvent.getHigh());
         if (!candlesticksHighPrices.containsKey(symbol)) {
-            Instant relativeTime = Instant.now().minus((config.getPeriodLength()-1) * (robotUtils.timeInMillis(event.getKey().getInterval())), ChronoUnit.MILLIS);
+            Instant relativeTime = Instant.now().minus(config.getPeriodLength() * (robotUtils.timeInMillis(event.getKey().getInterval())), ChronoUnit.MILLIS);
             CircularFifoQueue<BigDecimal> historyValues = robotUtils.loadHistory(symbol, event.getKey().getInterval(), relativeTime.toEpochMilli(), Instant.now().toEpochMilli())
                     .collect(
                             () -> new CircularFifoQueue<>(config.getPeriodLength()),
@@ -81,7 +80,7 @@ public class ATHValuesSignalProcessor {
             BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
 
             if (closePrice.doubleValue() <= currentAthValue.doubleValue() * config.getDivergenceForBuy()) {
-                eventPublisher.publishEvent(new CandlestickEvents.SignalEvent(symbol, OrderSide.BUY));
+                eventPublisher.publishEventAsync(new CandlestickEvents.SignalEvent(symbol, OrderSide.BUY));
             }
         }
     }

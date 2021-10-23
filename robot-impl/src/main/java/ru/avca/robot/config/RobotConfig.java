@@ -2,6 +2,8 @@ package ru.avca.robot.config;
 
 import com.binance.api.client.domain.market.CandlestickInterval;
 import io.micronaut.context.annotation.ConfigurationProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author a.chermashentsev
@@ -16,6 +18,8 @@ public class RobotConfig {
     private int coinsCount;
 
     private int initialBalance;
+    @Getter @Setter private String robotName;
+    @Getter @Setter private boolean enabled;
 
     public String getUsdCoin() {
         return usdCoin;

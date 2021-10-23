@@ -40,6 +40,9 @@ public class Runner {
     @EventListener
     @Async
     public void startRobot(StartupEvent event) {
+        if (!robotConfig.isEnabled()) {
+            return;
+        }
         LOG.info("Start robot with config {}", robotConfig);
         long currentTimeUtc = TimeUtils.getCurrentTimeUtc();
         long intervalMs = getIntervalMs(robotConfig.getInterval());
@@ -58,9 +61,9 @@ public class Runner {
                 robotConfig.getInterval(),
                 candlestick.getCloseTime(),
                 intervalMs,
-                robotStateService.getUsdtBalance()
+                robotStateService.getUsdtBalance("USDT")
                         .orElseGet(() -> new BigDecimal(robotConfig.getInitialBalance())),
-                robotStateService.loadAllOpenPositionInfos()
+                robotStateService.loadAllOpenPositionInfos(robotConfig.getRobotName())
         ));
 
     }

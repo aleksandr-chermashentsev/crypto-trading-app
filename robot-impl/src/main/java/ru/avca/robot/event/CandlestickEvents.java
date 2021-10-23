@@ -1,8 +1,11 @@
 package ru.avca.robot.event;
 
+import com.binance.api.client.domain.OrderSide;
 import com.binance.api.client.domain.event.CandlestickEvent;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import lombok.Value;
+
+import java.math.BigDecimal;
 
 /**
  * @author a.chermashentsev
@@ -44,5 +47,27 @@ public class CandlestickEvents {
     @Value
     public static class ListenerHasStoppedListenToCandlestickEvent {
         ListenerKey key;
+    }
+
+    @Value
+    public static class SignalEvent {
+        String symbol;
+        OrderSide orderSide;
+    }
+
+    @Value
+    public static class ExecutionEvent {
+        OrderSide side;
+        String symbol;
+        BigDecimal baseQty;
+        BigDecimal quoteQty;
+        BigDecimal price;
+    }
+
+    @Value
+    public static class MarketOrderEvent {
+        OrderSide side;
+        String symbol;
+        BigDecimal quantity;
     }
 }

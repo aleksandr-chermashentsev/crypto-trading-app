@@ -13,4 +13,5 @@ public class OpenPositionInfo {
     String symbol;
     BigDecimal balance;
     BigDecimal price;
+    int rebuyCount;
 }

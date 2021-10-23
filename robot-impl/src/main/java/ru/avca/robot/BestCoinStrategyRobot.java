@@ -11,6 +11,7 @@ import com.binance.api.client.domain.general.SymbolInfo;
 import com.binance.api.client.domain.general.SymbolStatus;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.exception.BinanceApiException;
+import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Value;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -44,7 +45,7 @@ import static ru.avca.robot.utils.TimeUtils.getCurrentTimeUtc;
  * @author a.chermashentsev
  * Date: 08.04.2021
  **/
-//@Context
+@Context
 public class BestCoinStrategyRobot {
     private static final Logger LOG = LoggerFactory.getLogger(BestCoinStrategyRobot.class);
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
@@ -188,7 +189,7 @@ public class BestCoinStrategyRobot {
 
         bestCoins.forEach(bestCoin -> openPosition(bestCoin, currentUsdtBalance.divide(new BigDecimal(startEvent.getCoinsCount()), 15, RoundingMode.CEILING)));
 
-        robotStateService.saveOpenPositions(openPositionInfosBySymbol.values().stream());
+        robotStateService.saveOpenPositions("bestCoin", openPositionInfosBySymbol.values().stream());
         Set<String> newSymbols = loadSymbols(startEvent.getUsdCoin())
                 .filter(symbol -> !alreadySubscribedSymbols.containsKey(symbol))
                 .peek(symbol -> alreadySubscribedSymbols.put(symbol, true))
@@ -236,7 +237,7 @@ public class BestCoinStrategyRobot {
         }
 
         openPositionInfosBySymbol.clear();
-        robotStateService.saveOpenPositions(Stream.empty());
+        robotStateService.saveOpenPositions("bestCoin", Stream.empty());
         robotStateService.saveCurrencyBalance("USDT", currentUsdtBalance);
         return result;
     }
@@ -258,7 +259,7 @@ public class BestCoinStrategyRobot {
             BigDecimal executedQty = new BigDecimal(newOrderResponse.getExecutedQty());
             BigDecimal quoteQty = new BigDecimal(newOrderResponse.getCummulativeQuoteQty());
             BigDecimal executedPrice = quoteQty.divide(executedQty, 15, RoundingMode.CEILING);
-            OpenPositionInfo info = new OpenPositionInfo(symbol, executedQty, executedPrice);
+            OpenPositionInfo info = new OpenPositionInfo(symbol, executedQty, executedPrice, 0);
             openPositionInfosBySymbol.put(symbol, info);
             LOG.info("Executed price for {} is {}", symbol, executedPrice);
 

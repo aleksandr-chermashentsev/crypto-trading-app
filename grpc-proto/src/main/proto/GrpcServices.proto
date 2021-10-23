@@ -34,6 +34,7 @@ message OpenPositionMsg {
   string price = 2;
   string balance = 3;
   string robotName = 4;
+  int32 rebuyCount = 5;
 }
 
 message RobotName {

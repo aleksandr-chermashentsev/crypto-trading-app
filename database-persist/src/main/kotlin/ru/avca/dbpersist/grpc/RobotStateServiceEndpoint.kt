@@ -23,7 +23,7 @@ class RobotStateServiceEndpoint(
     override fun updateOpenPositions(request: OpenPositionsMsg?, responseObserver: StreamObserver<Empty>?) {
         request!!
         val newPositions = request.openPositionsList.stream()
-            .map { OpenPositionDomain(it.symbol, it.price, it.balance, it.robotName) }
+            .map { OpenPositionDomain(it.symbol, it.price, it.balance, it.robotName, it.rebuyCount) }
             .collect(toList())
         openPositionRepository.updateOpenPositions(newPositions)
 

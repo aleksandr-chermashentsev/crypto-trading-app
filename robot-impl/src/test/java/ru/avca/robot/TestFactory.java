@@ -102,4 +102,10 @@ public class TestFactory {
         when(restClientMock.newOrder(any(NewOrder.class)))
                 .thenReturn(newOrderResponse);
     }
+
+    @Singleton
+    @Replaces
+    public BinanceApiClientFactory binanceApiClientFactory() {
+        return mock(BinanceApiClientFactory.class);
+    }
 }

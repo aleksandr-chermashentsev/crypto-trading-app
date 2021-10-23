@@ -34,7 +34,7 @@ public class RobotEvents {
     public static class BuyEvent {
         BigDecimal baseQty;
         BigDecimal quoteQty;
-        BigDecimal expectedPrice;
+        BigDecimal realPrice;
         String symbol;
     }
 

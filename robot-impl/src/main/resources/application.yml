@@ -35,13 +35,23 @@ robot:
 
 subscription:
   quoteFilter: USDT
-  candlestickIntervals: [ONE_MINUTE]
-  updateIntervalSec: 30
-athDevergenceRobotConfig:
+  candlestickIntervals: [DAILY]
+  updateIntervalSec: 86000000
+robotState:
   robotName: ath-robot-1
   usdCoin: USDT
-  interval: ONE_MINUTE
-  periodLength: 10
+  defaultUsdBalance: 50
+athDivergenceSignalConfig:
+  periodLength: 150
+  divergenceForBuy: 0.75
+riskProcessor:
+  maxNumberOfOpenPositions: 1
+  maxNumberOfBuyMore: 0
+  buyMorePercentOfOpenPosition: 0.5
+  buyMoreThreshold: 0.8
+  stopLoss: 0.9999
+  takeProfit: 1.0001
+  firstBuyPercent: 0.5
 
 endpoints:
   health:

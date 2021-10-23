@@ -33,7 +33,7 @@ public class EventsNotifierService {
                 .setBaseQty(buyEvent.getBaseQty().doubleValue())
                 .setQuoteQty(buyEvent.getQuoteQty().doubleValue())
                 .setSide(RobotTradeEvent.TradeSide.BUY)
-                .setExpectedPrice(buyEvent.getExpectedPrice().doubleValue())
+                .setExpectedPrice(buyEvent.getRealPrice().doubleValue())
                 .build();
         ListenableFuture<EventResponse> tgResponseFuture = tgBotNotifier.trade(tradeEvent);
         ListenableFuture<EventResponse> dbResponseFuture = databasePersist.trade(tradeEvent);

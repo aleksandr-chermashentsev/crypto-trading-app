@@ -33,16 +33,17 @@ public class RobotStateService {
                         value -> new OpenPositionInfo(
                                 value.getSymbol(),
                                 new BigDecimal(value.getBalance()),
-                                new BigDecimal(value.getPrice())
+                                new BigDecimal(value.getPrice()),
+                                value.getRebuyCount()
                         )
                 ));
     }
 
-    public Optional<BigDecimal> getUsdtBalance() {
+    public Optional<BigDecimal> getUsdtBalance(String usdCoin) {
         try {
             return robotStateServiceBlockingStub.getAllCurrencyBalance(Empty.getDefaultInstance())
                     .getCurrencyBalancesList().stream()
-                    .filter(msg -> "USDT".equals(msg.getSymbol().toUpperCase(Locale.ROOT)))
+                    .filter(msg -> usdCoin.equals(msg.getSymbol().toUpperCase(Locale.ROOT)))
                     .map(msg -> new BigDecimal(msg.getBalance()))
                     .findAny();
         } catch (Exception e) {
@@ -51,13 +52,14 @@ public class RobotStateService {
         }
     }
 
-    public void saveOpenPositions(Stream<OpenPositionInfo> openPositionInfos) {
+    public void saveOpenPositions(String robotName, Stream<OpenPositionInfo> openPositionInfos) {
         OpenPositionsMsg msg = OpenPositionsMsg.newBuilder().addAllOpenPositions(() -> openPositionInfos
                 .map(openPositionInfo ->
                         OpenPositionMsg.newBuilder()
                                 .setBalance(openPositionInfo.getBalance().toPlainString())
                                 .setSymbol(openPositionInfo.getSymbol())
                                 .setPrice(openPositionInfo.getPrice().toPlainString())
+                                .setRobotName(robotName)
                                 .build()
                 ).iterator()
         ).build();
