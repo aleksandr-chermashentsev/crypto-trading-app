@@ -35,6 +35,7 @@ robot:
 
 subscription:
   quoteFilter: USDT
+  baseFilter: [BTC, ETH, BNB, ADA, SOL, XRP, DOT, DOGE, LUNA, SHIB, UNI, AVAX, LINK, WBTC, LTC, BCH, ALGO, MATIC, XLM, VET, ATOM, ICP, AXS, FTT, FTM, FIL, ETC, TRX, THETA, BTCB]
   candlestickIntervals: [DAILY]
   updateIntervalSec: 86000000
 robotState:
@@ -51,7 +52,7 @@ riskProcessor:
   buyMoreThreshold: 0.8
   stopLoss: 0.9999
   takeProfit: 1.0001
-  firstBuyPercent: 0.5
+  firstBuyPercent: 1
 
 endpoints:
   health:

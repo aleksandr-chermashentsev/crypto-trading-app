@@ -52,7 +52,7 @@ public class RiskProcessorComponent {
     @Async
     public void onSignal(CandlestickEvents.SignalEvent signal) {
         lock();
-        if (state.openPositionsCount() < config.getMaxNumberOfOpenPositions()) {
+        if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions()) {
             BigDecimal usdBalance = state.getUsdQuantity();
             BigDecimal quantity = usdBalance
                     .divide(BigDecimal.valueOf(config.getMaxNumberOfOpenPositions()), 15, RoundingMode.CEILING)

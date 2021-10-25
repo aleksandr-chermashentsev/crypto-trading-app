@@ -5,6 +5,7 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author a.chermashentsev
@@ -14,7 +15,16 @@ import java.util.List;
 public class SubscriptionConfig {
     private String quoteFilter;
     private List<CandlestickInterval> candlestickIntervals;
+    private Set<String> baseFilter;
     private Duration updateInterval;
+
+    public Set<String> getBaseFilter() {
+        return baseFilter;
+    }
+
+    public void setBaseFilter(Set<String> baseFilter) {
+        this.baseFilter = baseFilter;
+    }
 
     public String getQuoteFilter() {
         return quoteFilter;

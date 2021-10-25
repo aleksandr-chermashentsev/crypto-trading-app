@@ -79,6 +79,7 @@ public class SubscriptionComponent {
     private Stream<String> getSymbolsStream() {
         return binanceApiClientFactory.newRestClient().getExchangeInfo().getSymbols().stream()
                 .filter(symbolInfo -> subscriptionConfig.getQuoteFilter().equals(symbolInfo.getQuoteAsset()))
+                .filter(symbolInfo -> subscriptionConfig.getBaseFilter().isEmpty() || subscriptionConfig.getBaseFilter().contains(symbolInfo.getBaseAsset().toUpperCase()))
                 .filter(symbolInfo -> symbolInfo.getStatus() == SymbolStatus.TRADING)
                 .map(SymbolInfo::getSymbol);
     }

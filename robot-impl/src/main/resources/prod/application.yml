@@ -32,6 +32,26 @@ robot:
   coinsCount: 1
   initialBalance: 25
 
+subscription:
+  quoteFilter: USDT
+  baseFilter: [BTC, ETH, BNB, ADA, SOL, XRP, DOT, DOGE, LUNA, SHIB, UNI, AVAX, LINK, WBTC, LTC, BCH, ALGO, MATIC, XLM, VET, ATOM, ICP, AXS, FTT, FTM, FIL, ETC, TRX, THETA, BTCB]
+  candlestickIntervals: [DAILY]
+  updateIntervalSec: 9999999999
+robotState:
+  robotName: ath-robot-1
+  usdCoin: USDT
+  defaultUsdBalance: 50
+athDivergenceSignalConfig:
+  periodLength: 30
+  divergenceForBuy: 0.75
+riskProcessor:
+  maxNumberOfOpenPositions: 1
+  maxNumberOfBuyMore: 0
+  buyMorePercentOfOpenPosition: 0.5
+  buyMoreThreshold: 0
+  stopLoss: 0.7
+  takeProfit: 1.1
+  firstBuyPercent: 1
 endpoints:
   health:
     enabled: true
