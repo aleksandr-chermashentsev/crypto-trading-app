@@ -3,6 +3,7 @@ package ru.avca.robot.athdevergence;
 import com.binance.api.client.domain.OrderSide;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.Value;
 import ru.avca.robot.OpenPositionInfo;
 import ru.avca.robot.event.RobotEvents;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
  * Date: 06.10.2021
  **/
 @AllArgsConstructor
+@ToString
 public class ATHDivergenceState {
     @Getter private final String usdCoin;
     @Getter private volatile BigDecimal usdQuantity;
