@@ -43,4 +43,10 @@ public class RobotEvents {
         String symbol;
         BigDecimal usdBalance;
     }
+
+    @Value
+    public static class CloseToAthValues {
+        String symbol;
+        Double closePercent;
+    }
 }

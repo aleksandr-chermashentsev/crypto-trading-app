@@ -29,8 +29,11 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.grpc:micronaut-grpc-client-runtime")
     implementation("io.micronaut.netflix:micronaut-netflix-hystrix")
+    implementation "io.micronaut.micrometer:micronaut-micrometer-core"
+    // micrometer-registry-statsd also pulls in micrometer-core so included above to verbose example
+    implementation "io.micronaut.micrometer:micronaut-micrometer-registry-statsd"
     runtime("io.micronaut:micronaut-discovery-client")
-    implementation ("io.micronaut:micronaut-http-netty")
+    implementation("io.micronaut:micronaut-http-netty")
     implementation("javax.annotation:javax.annotation-api")
     implementation("org.apache.logging.log4j:log4j-core:2.13.2")
     implementation("com.github.binance-exchange:binance-java-api:-SNAPSHOT")
@@ -57,7 +60,7 @@ java {
 }
 
 dockerfile {
-    args('-Xmx128m')
+    args('-Xmx256m')
     args('-Dmicronaut.config.files=/home/app/resources/prod/application.yml')
 }
 
@@ -75,6 +78,6 @@ jib {
     }
 }
 
-tasks.withType(Test)  {
+tasks.withType(Test) {
     maxParallelForks = 1
 }

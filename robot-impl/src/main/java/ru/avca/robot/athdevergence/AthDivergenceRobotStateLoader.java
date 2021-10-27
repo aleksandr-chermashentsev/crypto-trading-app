@@ -46,7 +46,7 @@ public class AthDivergenceRobotStateLoader {
 
         //update current balances
         balancesFromBinance.forEach((symbol, qty) -> {
-            OpenPositionInfo dbBalance = balances.get(symbol+robotConfig.getUsdCoin());
+            OpenPositionInfo dbBalance = balances.get(symbol + robotConfig.getUsdCoin());
             if (dbBalance != null) {
                 balances.put(symbol + robotConfig.getUsdCoin(),
                         new OpenPositionInfo(

@@ -3,6 +3,12 @@ micronaut:
     name: robot-impl
   server:
     port: 8083
+  metrics:
+    enabled: true
+  endpoints:
+    metrics:
+      enabled: Boolean
+      sensitive: Boolean
 hystrix.stream.enabled: false
 
 consul:
@@ -43,7 +49,7 @@ robotState:
   usdCoin: USDT
   defaultUsdBalance: 50
 athDivergenceSignalConfig:
-  periodLength: 150
+  periodLength: 30
   divergenceForBuy: 0.75
 riskProcessor:
   maxNumberOfOpenPositions: 1

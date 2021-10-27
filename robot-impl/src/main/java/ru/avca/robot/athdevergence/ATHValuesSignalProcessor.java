@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.avca.robot.config.AthDivergenceSignalConfig;
 import ru.avca.robot.event.CandlestickEvents;
+import ru.avca.robot.event.RobotEvents;
 import ru.avca.robot.utils.RobotUtils;
 
 import javax.inject.Inject;
@@ -35,6 +36,7 @@ public class ATHValuesSignalProcessor {
     @Inject private ApplicationEventPublisher eventPublisher;
     private final ConcurrentMap<String, CircularFifoQueue<BigDecimal>> candlesticksHighPrices = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, BigDecimal> candlesticksCurrentAthValues = new ConcurrentHashMap<>();
+    private volatile long lastSendTime;
 
     @EventListener
     @Async
@@ -67,21 +69,28 @@ public class ATHValuesSignalProcessor {
                 if ((lastHighPrice != null && lastHighPrice.equals(athValue)) || currentAthValue == null) {
                     BigDecimal newHighPrice = calculateHighPrice(symbol, highPrices);
                     candlesticksCurrentAthValues.put(symbol, newHighPrice);
-                } else {
+                }
+                else {
                     BigDecimal prevAthValue = currentAthValue;
                     if (prevAthValue.doubleValue() < lastEventHighPrice.doubleValue()) {
                         candlesticksCurrentAthValues.put(symbol, lastEventHighPrice);
                     }
                 }
-            } else {
+            }
+            else {
                 highPrices.add(lastEventHighPrice);
             }
-        } else if (currentAthValue != null){
+        }
+        else if (currentAthValue != null) {
             BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
 
             if (closePrice.doubleValue() <= currentAthValue.doubleValue() * config.getDivergenceForBuy()) {
                 eventPublisher.publishEventAsync(new CandlestickEvents.SignalEvent(symbol, OrderSide.BUY));
             }
+            eventPublisher.publishEventAsync(new RobotEvents.CloseToAthValues(
+                    symbol,
+                    closePrice.doubleValue() / currentAthValue.doubleValue()
+            ));
         }
     }
 
