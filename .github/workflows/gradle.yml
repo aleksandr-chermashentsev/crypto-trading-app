@@ -37,11 +37,10 @@ jobs:
         run: |
           doctl registry login
 
-          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/robot-impl"
+          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/robot-impl" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
           cd robot-impl
-          ./gradlew check dockerBuild --no-daemon
-          docker push ${DOCKER_IMAGE}:0.101
+          ./gradlew check dockerPush --no-daemon
 
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/database-persist" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
