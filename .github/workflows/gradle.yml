@@ -41,7 +41,7 @@ jobs:
           echo ${DOCKER_REGISTRY_URL}
           cd robot-impl
           ./gradlew check dockerBuild --no-daemon
-          docker push ${DOCKER_REGISTRY_URL}
+          docker push ${DOCKER_IMAGE}
 
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/database-persist" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
