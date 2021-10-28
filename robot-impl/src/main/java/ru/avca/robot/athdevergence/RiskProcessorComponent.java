@@ -46,7 +46,7 @@ public class RiskProcessorComponent {
     @EventListener
     public void onStart(StartupEvent startupEvent) {
         state = stateLoader.loadState();
-        LOG.info("State loaded");
+        LOG.info("State loaded {}", state);
     }
 
     @EventListener
