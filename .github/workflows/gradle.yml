@@ -35,12 +35,13 @@ jobs:
           DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY_URL }}
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
-          doctl registry login
+          doctl registry login --expiry-seconds 600
 
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/robot-impl" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
           cd robot-impl
-          ./gradlew check dockerPush --no-daemon
+          ./gradlew check dockerBuild --no-daemon
+          docker push ${DOCKER_REGISTRY_URL}
 
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/database-persist" | sed -e 's#//#/#' -e 's#^/##'`
           echo ${DOCKER_REGISTRY_URL}
