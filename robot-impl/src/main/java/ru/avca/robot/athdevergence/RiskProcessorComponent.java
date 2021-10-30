@@ -54,6 +54,7 @@ public class RiskProcessorComponent {
     public void onSignal(CandlestickEvents.SignalEvent signal) {
         lock();
         if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions()) {
+            updateBalance();
             BigDecimal usdBalance = state.getUsdQuantity();
             BigDecimal quantity = usdBalance
                     .divide(BigDecimal.valueOf(config.getMaxNumberOfOpenPositions()), 15, RoundingMode.CEILING)
@@ -131,11 +132,20 @@ public class RiskProcessorComponent {
     }
 
     private void onSell(RobotEvents.SellEvent sellEvent) {
+        updateBalance();
         state.addSell(sellEvent);
         robotStateService.saveOpenPositions(robotConfig.getRobotName(), state.openPositions());
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
         unlockFeature.cancel(true);
         buyLock.unlock();
         eventPublisher.publishEventAsync(sellEvent);
+    }
+
+    private void updateBalance() {
+        robotStateService.getUsdtBalance(robotConfig.getUsdCoin())
+                        .ifPresent(usdQuantity -> {
+                            state.addUsdQuantity(usdQuantity);
+                            LOG.info("Usd quantity was increased on {}", usdQuantity);
+                        });
     }
 }
