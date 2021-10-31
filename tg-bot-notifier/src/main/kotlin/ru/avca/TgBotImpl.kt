@@ -63,19 +63,23 @@ open class TgBotImpl(
         }
         if (event.side == RobotTradeEvent.TradeSide.BUY) {
             val price = event.quoteQty / event.baseQty
-            telegramBot.execute(SendMessage(adminChatIds,
-                "${event.symbol} was bought\n" +
-                        "💵 USDT quantity ${event.quoteQty}\n" +
-                        "🗑 Slippage is ${((1 - price / event.expectedPrice) * 100).roundToInt()}%"
-            ))
+            adminChatIds.forEach {
+                telegramBot.execute(SendMessage(it,
+                    "${event.symbol} was bought\n" +
+                            "💵 USDT quantity ${event.quoteQty}\n" +
+                            "🗑 Slippage is ${((1 - price / event.expectedPrice) * 100).roundToInt()}%"
+                ))
+            }
         }
         else {
-            telegramBot.execute(
-                SendMessage(adminChatIds,
-                    "${event.symbol} sell\n" +
-                            "💵 USDT quantity ${event.quoteQty}\n"
+            adminChatIds.forEach {
+                telegramBot.execute(
+                    SendMessage(it,
+                        "${event.symbol} sell\n" +
+                                "💵 USDT quantity ${event.quoteQty}\n"
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -97,7 +101,8 @@ open class TgBotImpl(
             LOG.info("Do nothing on start event because adminChatId is not set")
             return
         }
-        telegramBot.execute(SendMessage(adminChatIds, "Robot has started"))
+        adminChatIds.forEach { telegramBot.execute(SendMessage(it, "Robot has started")) }
+
     }
 
     @EventListener
@@ -108,9 +113,12 @@ open class TgBotImpl(
             return
         }
         if (event.openPositionsUsdtBalance <= 0) {
-            telegramBot.execute(SendMessage(adminChatIds,
-                "All positions closed, current balance is ${event.openPositionsUsdtBalance}"
-            ))
+            adminChatIds.forEach {
+                telegramBot.execute(SendMessage(it,
+                    "All positions closed, current balance is ${event.openPositionsUsdtBalance}"
+                ))
+            }
+
             return
         }
         var rocketSign = "\uD83D\uDE80"//🚀
@@ -118,8 +126,10 @@ open class TgBotImpl(
             rocketSign = "\uD83D\uDCC9"//📉
         }
 
-        telegramBot.execute(SendMessage(adminChatIds,
-            "$rocketSign Current balance is ${event.openPositionsUsdtBalance}, old balance is ${event.oldUsdtBalance}"
-        ))
+        adminChatIds.forEach {
+            telegramBot.execute(SendMessage(it,
+                "$rocketSign Current balance is ${event.openPositionsUsdtBalance}, old balance is ${event.oldUsdtBalance}"
+            ))
+        }
     }
 }
