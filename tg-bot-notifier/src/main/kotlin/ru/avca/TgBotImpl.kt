@@ -86,7 +86,8 @@ open class TgBotImpl(
             LOG.info("Do nothing on restart event because adminChatId is not set")
             return
         }
-        telegramBot.execute(SendMessage(adminChatIds, "Connections issue. Robot listener was restarted"))
+        adminChatIds.forEach { telegramBot.execute(SendMessage(it, "Connections issue. Robot listener was restarted")) }
+
     }
 
     @EventListener
