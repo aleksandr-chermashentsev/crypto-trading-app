@@ -74,8 +74,8 @@ public class ATHDivergenceState {
         usdQuantity = usdQuantity.add(sellEvent.getUsdBalance());
     }
 
-    public synchronized void addUsdQuantity(BigDecimal usdQuantity) {
-        this.usdQuantity = usdQuantity.add(usdQuantity);
+    public synchronized void setUsdQuantity(BigDecimal usdQuantity) {
+        this.usdQuantity = usdQuantity;
     }
 
     @Value

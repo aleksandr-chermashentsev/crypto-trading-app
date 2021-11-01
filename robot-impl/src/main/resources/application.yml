@@ -5,10 +5,11 @@ micronaut:
     port: 8083
   metrics:
     enabled: true
-  endpoints:
-    metrics:
-      enabled: Boolean
-      sensitive: Boolean
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
+        descriptions: true
 hystrix.stream.enabled: false
 
 consul:
@@ -63,4 +64,6 @@ riskProcessor:
 endpoints:
   health:
     enabled: true
+    sensitive: false
+  prometheus:
     sensitive: false

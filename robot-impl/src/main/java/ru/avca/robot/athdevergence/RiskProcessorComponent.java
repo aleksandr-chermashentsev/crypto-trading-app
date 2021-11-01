@@ -144,8 +144,8 @@ public class RiskProcessorComponent {
     private void updateBalance() {
         robotStateService.getUsdtBalance(robotConfig.getUsdCoin())
                         .ifPresent(usdQuantity -> {
-                            state.addUsdQuantity(usdQuantity);
-                            LOG.info("Usd quantity was increased on {}", usdQuantity);
+                            state.setUsdQuantity(usdQuantity);
+                            LOG.info("Usd quantity was set to {}", usdQuantity);
                         });
     }
 }
