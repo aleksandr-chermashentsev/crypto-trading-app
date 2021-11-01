@@ -2,6 +2,7 @@ package ru.avca.robot;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -9,6 +10,7 @@ import io.micronaut.scheduling.annotation.Async;
 import ru.avca.robot.event.RobotEvents;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,7 +30,7 @@ public class InfoProvider {
     @EventListener
     @Async
     public void onCloseToAthValues(RobotEvents.CloseToAthValues closeToAthValues) {
-        AtomicDouble atomicDouble = gauges.computeIfAbsent(closeToAthValues.getSymbol(), key -> meterRegistry.gauge("robot.close_to_ath." + key,
+        AtomicDouble atomicDouble = gauges.computeIfAbsent(closeToAthValues.getSymbol(), key -> meterRegistry.gauge("robot.close_to_ath", List.of(Tag.of("symbol", key)),
                 new AtomicDouble()
         ));
         atomicDouble.set(closeToAthValues.getClosePercent());
