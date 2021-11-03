@@ -33,6 +33,7 @@ public class CandlestickListener {
     private ApplicationEventPublisher eventPublisher;
     @Inject
     private BinanceApiClientFactory clientFactory;
+    @Inject private InfoProvider infoProvider;
     private final ConcurrentMap<ListenerKey, Boolean> startedListeners = new ConcurrentHashMap<>();
     private final ConcurrentMap<ListenerKey, CountDownLatch> latches = new ConcurrentHashMap<>();
 
@@ -94,6 +95,7 @@ public class CandlestickListener {
 
                 @Override
                 public void onResponse(CandlestickEvent event) {
+                    infoProvider.updateCandlestickEvent(event);
                     if (LOG.isDebugEnabled()) {
                         LOG.info("Got new event {} ", event);
                     }

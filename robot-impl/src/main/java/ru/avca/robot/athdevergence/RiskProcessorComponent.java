@@ -1,6 +1,8 @@
 package ru.avca.robot.athdevergence;
 
+import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.domain.OrderSide;
+import com.binance.api.client.domain.account.AssetBalance;
 import com.binance.api.client.domain.event.CandlestickEvent;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -9,6 +11,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.scheduling.annotation.Async;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.avca.robot.InfoProvider;
 import ru.avca.robot.config.AthDivergenceRobotConfig;
 import ru.avca.robot.config.RiskProcessorConfig;
 import ru.avca.robot.event.CandlestickEvents;
@@ -18,11 +21,14 @@ import ru.avca.robot.grpc.RobotStateService;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author a.chermashentsev
@@ -38,6 +44,8 @@ public class RiskProcessorComponent {
     @Inject private ApplicationEventPublisher eventPublisher;
     @Inject private AthDivergenceRobotConfig robotConfig;
     @Inject private MarketOrderExecutor marketOrderExecutor;
+    @Inject private BinanceApiClientFactory binanceApiClientFactory;
+    @Inject private InfoProvider infoProvider;
     private volatile ATHDivergenceState state;
     private final ReentrantLock buyLock = new ReentrantLock();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -59,7 +67,9 @@ public class RiskProcessorComponent {
             BigDecimal quantity = usdBalance
                     .divide(BigDecimal.valueOf(config.getMaxNumberOfOpenPositions()), 15, RoundingMode.CEILING)
                     .multiply(BigDecimal.valueOf(config.getFirstBuyPercent()));
-            LOG.info("First buy {} on {}", signal.getSymbol(), quantity);
+            double takeProfitPrice = quantity.doubleValue() * config.getTakeProfit();
+            double stopLossPrice = quantity.doubleValue() * config.getStopLoss();
+            LOG.info("First buy {} on {}. TP {} SL {}", signal.getSymbol(), quantity, takeProfitPrice, stopLossPrice);
             onBuy(marketOrderExecutor.openPosition(new CandlestickEvents.MarketOrderEvent(
                     OrderSide.BUY,
                     signal.getSymbol(),
@@ -85,45 +95,55 @@ public class RiskProcessorComponent {
         CandlestickEvent binanceEvent = candlestickEvent.getBinanceEvent();
         String symbol = binanceEvent.getSymbol();
         state.getOpenPosition(symbol)
-        .ifPresent(openPosition -> {
-            BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
-            //check stop loss and loss buy more
-            if (openPosition.getPrice().doubleValue() > closePrice.doubleValue()) {
-                if (openPosition.getRebuyCount() < config.getMaxNumberOfBuyMore() && openPosition.getPrice().doubleValue() * config.getBuyMoreThreshold() >= closePrice.doubleValue()) {
-                    lock();
-                    LOG.info("Buy more {}", symbol);
-                    onBuy(marketOrderExecutor.openPosition(new CandlestickEvents.MarketOrderEvent(
-                            OrderSide.BUY,
-                            symbol,
-                            openPosition.getBalance().multiply(openPosition.getPrice()).divide(BigDecimal.valueOf(config.getBuyMorePercentOfOpenPosition()), 15, RoundingMode.CEILING)
-                    )));
-                }
-                else if (openPosition.getPrice().doubleValue() * config.getStopLoss() >= closePrice.doubleValue()) {
-                    lock();
-                    LOG.info("Stop loss sell {}", symbol);
-                    onSell(marketOrderExecutor.closePosition(new CandlestickEvents.MarketOrderEvent(
-                            OrderSide.SELL,
-                            symbol,
-                            openPosition.getBalance()
-                    )));
-                }
-            }
-            //check take profit
-            else if (openPosition.getPrice().doubleValue() * config.getTakeProfit() <= closePrice.doubleValue()){
-                lock();
-                LOG.info("Take profit sell {}", symbol);
-                onSell(marketOrderExecutor.closePosition(new CandlestickEvents.MarketOrderEvent(
-                        OrderSide.SELL,
-                        symbol,
-                        openPosition.getBalance()
-                )));
+                .ifPresent(openPosition -> {
+                    BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
+                    double takeProfitPrice = openPosition.getPrice().doubleValue() * config.getTakeProfit();
+                    double stopLossPrice = openPosition.getPrice().doubleValue() * config.getStopLoss();
+                    double currentValueInPercentOfTpAndSl = (closePrice.doubleValue() - stopLossPrice) / (takeProfitPrice - stopLossPrice);
+                    infoProvider.updateOpenPositionInfo(currentValueInPercentOfTpAndSl);
+                    //TODO send currentValueInPercentOfTpAndSl to infoProvider
+                    //check stop loss and loss buy more
+                    if (openPosition.getPrice().doubleValue() > closePrice.doubleValue()) {
+                        if (openPosition.getRebuyCount() < config.getMaxNumberOfBuyMore() && openPosition.getPrice().doubleValue() * config.getBuyMoreThreshold() >= closePrice.doubleValue()) {
+                            lock();
+                            LOG.info("Buy more {}", symbol);
+                            onBuy(marketOrderExecutor.openPosition(new CandlestickEvents.MarketOrderEvent(
+                                    OrderSide.BUY,
+                                    symbol,
+                                    openPosition.getBalance().multiply(openPosition.getPrice()).divide(BigDecimal.valueOf(config.getBuyMorePercentOfOpenPosition()), 15, RoundingMode.CEILING)
+                            )));
+                        }
+                        else {
+                            if (stopLossPrice >= closePrice.doubleValue()) {
+                                lock();
+                                LOG.info("Stop loss sell {}", symbol);
+                                onSell(marketOrderExecutor.closePosition(new CandlestickEvents.MarketOrderEvent(
+                                        OrderSide.SELL,
+                                        symbol,
+                                        openPosition.getBalance()
+                                )));
+                            }
+                        }
+                    }
+                    //check take profit
+                    else {
+                        if (takeProfitPrice <= closePrice.doubleValue()) {
+                            lock();
+                            LOG.info("Take profit sell {}", symbol);
+                            onSell(marketOrderExecutor.closePosition(new CandlestickEvents.MarketOrderEvent(
+                                    OrderSide.SELL,
+                                    symbol,
+                                    openPosition.getBalance()
+                            )));
 
-            }
-        });
+                        }
+                    }
+                });
     }
 
     private void onBuy(RobotEvents.BuyEvent buyEvent) {
         state.addBuy(buyEvent);
+        infoProvider.clearOpenPositionInfo();
         robotStateService.saveOpenPositions(robotConfig.getRobotName(), state.openPositions());
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
         unlockFeature.cancel(true);
@@ -133,6 +153,7 @@ public class RiskProcessorComponent {
 
     private void onSell(RobotEvents.SellEvent sellEvent) {
         updateBalance();
+        infoProvider.clearOpenPositionInfo();
         state.addSell(sellEvent);
         robotStateService.saveOpenPositions(robotConfig.getRobotName(), state.openPositions());
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
@@ -142,10 +163,14 @@ public class RiskProcessorComponent {
     }
 
     private void updateBalance() {
-        robotStateService.getUsdtBalance(robotConfig.getUsdCoin())
-                        .ifPresent(usdQuantity -> {
-                            state.setUsdQuantity(usdQuantity);
-                            LOG.info("Usd quantity was set to {}", usdQuantity);
-                        });
+        Optional.ofNullable(binanceApiClientFactory.newRestClient().getAccount().getBalances()
+                        .stream()
+                        .filter(assetBalance -> new BigDecimal(assetBalance.getFree()).doubleValue() > 0.0000001D)
+                        .collect(toMap(AssetBalance::getAsset, balance -> new BigDecimal(balance.getFree())))
+                        .get(robotConfig.getUsdCoin()))
+                .ifPresent(usdQuantity -> {
+                    state.setUsdQuantity(usdQuantity);
+                    LOG.info("Usd quantity was set to {}", usdQuantity);
+                });
     }
 }
