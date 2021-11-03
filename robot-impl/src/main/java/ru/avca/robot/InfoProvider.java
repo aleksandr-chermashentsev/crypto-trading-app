@@ -15,7 +15,6 @@ import ru.avca.robot.event.RobotEvents;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,8 +32,6 @@ public class InfoProvider {
     private final ConcurrentHashMap<String, AtomicDouble> athValueGauges = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicLong> candleStickLastUpdateTimes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, AtomicInteger> candleStickGauges = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, AtomicLong> candleStickDeliveryTimes = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, AtomicInteger> candleStickDeliveryGauges = new ConcurrentHashMap<>();
     private volatile AtomicDouble openPositionInfo;
     private static final Logger LOG = LoggerFactory.getLogger(InfoProvider.class);
 
@@ -88,26 +85,18 @@ public class InfoProvider {
     }
 
     public void updateCandlestickEvent(CandlestickEvent event) {
-        updateTime(candleStickLastUpdateTimes, candleStickGauges, event.getSymbol(), "robot.candle_update_interval");
-    }
-
-    public void updateCandlestickDeliveryTime(CandlestickEvent event) {
-        updateTime(candleStickDeliveryTimes, candleStickDeliveryGauges, event.getSymbol(), "robot.candle_delivery_interval");
-    }
-
-    private void updateTime(Map<String, AtomicLong> times, Map<String, AtomicInteger> gauges, String symbol, String metricName) {
-        long currentTime = System.nanoTime();
-        AtomicLong lastUpdateTime = times.computeIfAbsent(symbol, key -> new AtomicLong());
+        long currentTime = System.currentTimeMillis();
+        String symbol = event.getSymbol();
+        AtomicLong lastUpdateTime = candleStickLastUpdateTimes.computeIfAbsent(symbol, key -> new AtomicLong());
         long lastUpdateTimeUnboxed = lastUpdateTime.get();
         if (lastUpdateTimeUnboxed > 0) {
-            AtomicInteger diffBetweenUpdateTime = gauges.computeIfAbsent(symbol,
-                    key -> meterRegistry.gauge(metricName, List.of(Tag.of("symbol", symbol)), new AtomicInteger())
+            AtomicInteger diffBetweenUpdateTime = candleStickGauges.computeIfAbsent(symbol,
+                    key -> meterRegistry.gauge("robot.candle_update_interval", List.of(Tag.of("symbol", symbol)), new AtomicInteger())
             );
 
             diffBetweenUpdateTime.set((int) (currentTime - lastUpdateTimeUnboxed));
         }
 
         lastUpdateTime.set(currentTime);
-
     }
 }
