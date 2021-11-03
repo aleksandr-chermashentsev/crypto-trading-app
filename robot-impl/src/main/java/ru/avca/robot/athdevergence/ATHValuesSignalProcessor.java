@@ -9,6 +9,7 @@ import io.micronaut.scheduling.annotation.Async;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.avca.robot.InfoProvider;
 import ru.avca.robot.config.AthDivergenceSignalConfig;
 import ru.avca.robot.event.CandlestickEvents;
 import ru.avca.robot.event.RobotEvents;
@@ -34,6 +35,7 @@ public class ATHValuesSignalProcessor {
     @Inject private AthDivergenceSignalConfig config;
     @Inject private RobotUtils robotUtils;
     @Inject private ApplicationEventPublisher eventPublisher;
+    @Inject private InfoProvider infoProvider;
     private final ConcurrentMap<String, CircularFifoQueue<BigDecimal>> candlesticksHighPrices = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, BigDecimal> candlesticksCurrentAthValues = new ConcurrentHashMap<>();
     private volatile long lastSendTime;
@@ -41,6 +43,7 @@ public class ATHValuesSignalProcessor {
     @EventListener
     @Async
     public void onCandlestickEvent(CandlestickEvents.BinanceCandlestickEvent event) {
+        infoProvider.updateCandlestickDeliveryTime(event.getBinanceEvent());
         CandlestickEvent binanceEvent = event.getBinanceEvent();
         String symbol = binanceEvent.getSymbol();
         BigDecimal lastEventHighPrice = new BigDecimal(binanceEvent.getHigh());
