@@ -17,6 +17,9 @@ service RobotStateService {
   rpc GetAllOpenPositions (RobotName) returns (OpenPositionsMsg);
   rpc SaveCurrencyBalance (CurrencyBalanceMsg) returns (Empty);
   rpc GetAllCurrencyBalance (Empty) returns (CurrencyBalancesMsg);
+  rpc TurnOffSymbol(Symbol) returns (Empty);
+  rpc TurnOnSymbol(Symbol) returns (Empty);
+  rpc GetAllTurnOffSymbols(Empty) returns (Symbols);
 }
 
 service RobotStateManager {
@@ -92,4 +95,12 @@ message RobotStartEvent {}
 message ProfitInfo {
   double oldUsdtBalance = 1;
   double openPositionsUsdtBalance = 2;
+}
+
+message Symbol {
+  string symbol = 1;
+}
+
+message Symbols {
+  repeated string symbol = 1;
 }

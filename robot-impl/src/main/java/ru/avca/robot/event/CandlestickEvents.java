@@ -53,6 +53,7 @@ public class CandlestickEvents {
     public static class SignalEvent {
         String symbol;
         OrderSide orderSide;
+        double athDivergencePrice;
     }
 
     @Value

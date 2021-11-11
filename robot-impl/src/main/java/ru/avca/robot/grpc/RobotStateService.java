@@ -75,4 +75,21 @@ public class RobotStateService {
                         .build()
         );
     }
+
+    public void turnOffSymbol(String symbol) {
+        robotStateServiceBlockingStub.turnOffSymbol(Symbol.newBuilder()
+                .setSymbol(symbol)
+                .build()
+        );
+    }
+
+    public void turnOnSymbol(String symbol) {
+        robotStateServiceBlockingStub.turnOnSymbol(Symbol.newBuilder()
+                        .setSymbol(symbol)
+                        .build());
+    }
+
+    public Stream<String> getAllTurnedOffSymbols() {
+        return robotStateServiceBlockingStub.getAllTurnOffSymbols(Empty.getDefaultInstance()).getSymbolList().stream();
+    }
 }

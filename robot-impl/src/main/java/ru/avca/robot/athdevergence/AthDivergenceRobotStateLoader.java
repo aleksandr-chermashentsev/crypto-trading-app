@@ -12,9 +12,13 @@ import ru.avca.robot.grpc.RobotStateService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -42,6 +46,9 @@ public class AthDivergenceRobotStateLoader {
         robotStateService.getUsdtBalance(robotConfig.getUsdCoin())
                 .map(savedBalance -> getClampedBalance(balancesFromBinance, savedBalance))
                 .orElseGet(() -> getClampedBalance(balancesFromBinance, new BigDecimal(robotConfig.getDefaultUsdBalance())));
+
+        Set<String> turnedOffSymbols = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        turnedOffSymbols.addAll(robotStateService.getAllTurnedOffSymbols().collect(Collectors.toSet()));
 
 
         //update current balances
@@ -71,7 +78,8 @@ public class AthDivergenceRobotStateLoader {
                 robotConfig.getUsdCoin(),
                 balancesFromBinance.get(robotConfig.getUsdCoin()),
                 orders,
-                balances
+                balances,
+                turnedOffSymbols
         );
     }
 

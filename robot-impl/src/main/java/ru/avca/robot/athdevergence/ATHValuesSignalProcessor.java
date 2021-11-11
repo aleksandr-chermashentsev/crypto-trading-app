@@ -84,8 +84,9 @@ public class ATHValuesSignalProcessor {
         else if (currentAthValue != null) {
             BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
 
-            if (closePrice.doubleValue() <= currentAthValue.doubleValue() * config.getDivergenceForBuy()) {
-                eventPublisher.publishEventAsync(new CandlestickEvents.SignalEvent(symbol, OrderSide.BUY));
+            double athDivergencePrice = currentAthValue.doubleValue() * config.getDivergenceForBuy();
+            if (closePrice.doubleValue() <= athDivergencePrice) {
+                eventPublisher.publishEventAsync(new CandlestickEvents.SignalEvent(symbol, OrderSide.BUY, athDivergencePrice));
             }
             eventPublisher.publishEventAsync(new RobotEvents.CloseToAthValues(
                     symbol,

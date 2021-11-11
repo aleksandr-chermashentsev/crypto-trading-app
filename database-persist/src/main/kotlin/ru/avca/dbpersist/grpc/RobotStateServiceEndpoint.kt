@@ -6,6 +6,7 @@ import ru.avca.dbpersist.domain.CurrencyBalanceDomain
 import ru.avca.dbpersist.domain.OpenPositionDomain
 import ru.avca.dbpersist.repository.CurrencyBalanceRepository
 import ru.avca.dbpersist.repository.OpenPositionRepository
+import ru.avca.dbpersist.repository.TurnedOffSymbolsRepository
 import ru.avca.grpcservices.*
 import java.util.stream.Collectors.toList
 import javax.inject.Inject
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @Context
 class RobotStateServiceEndpoint(
     @Inject private val currencyBalanceRepository: CurrencyBalanceRepository,
-    @Inject private val openPositionRepository: OpenPositionRepository
+    @Inject private val openPositionRepository: OpenPositionRepository,
+    @Inject private val turnedOffSymbolsRepository: TurnedOffSymbolsRepository
 ) : RobotStateServiceGrpc.RobotStateServiceImplBase() {
     override fun updateOpenPositions(request: OpenPositionsMsg?, responseObserver: StreamObserver<Empty>?) {
         request!!
@@ -76,5 +78,27 @@ class RobotStateServiceEndpoint(
         )
 
         responseObserver?.onCompleted()
+    }
+
+    override fun turnOffSymbol(request: Symbol?, responseObserver: StreamObserver<Empty>?) {
+        turnedOffSymbolsRepository.turnOffSymbol(request!!.symbol)
+
+        responseObserver?.onNext(Empty.getDefaultInstance())
+        responseObserver?.onCompleted()
+    }
+
+    override fun turnOnSymbol(request: Symbol?, responseObserver: StreamObserver<Empty>?) {
+        turnedOffSymbolsRepository.turnOnSymbol(request!!.symbol)
+        responseObserver?.onNext(Empty.getDefaultInstance())
+        responseObserver?.onCompleted()
+    }
+
+    override fun getAllTurnOffSymbols(request: Empty?, responseObserver: StreamObserver<Symbols>?) {
+        responseObserver?.onNext(Symbols.newBuilder()
+            .addAllSymbol(turnedOffSymbolsRepository.getAllSymbols().map{ it.symbol})
+            .build()
+        )
+        responseObserver?.onCompleted()
+
     }
 }

@@ -42,7 +42,7 @@ robot:
 
 subscription:
   quoteFilter: USDT
-  baseFilter: [BTC, ETH, BNB, ADA, SOL, XRP, DOT, DOGE, LUNA, SHIB, UNI, AVAX, LINK, WBTC, LTC, BCH, ALGO, MATIC, XLM, VET, ATOM, ICP, AXS, FTT, FTM, FIL, ETC, TRX, THETA, BTCB]
+  baseFilter: [BTC]
   candlestickIntervals: [DAILY]
   updateIntervalSec: 86000000
 robotState:
@@ -51,7 +51,7 @@ robotState:
   defaultUsdBalance: 50
 athDivergenceSignalConfig:
   periodLength: 30
-  divergenceForBuy: 0.75
+  divergenceForBuy: 0.15
 riskProcessor:
   maxNumberOfOpenPositions: 1
   maxNumberOfBuyMore: 0

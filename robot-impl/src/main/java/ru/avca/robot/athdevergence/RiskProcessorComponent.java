@@ -21,11 +21,9 @@ import ru.avca.robot.grpc.RobotStateService;
 import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.util.stream.Collectors.toMap;
@@ -50,7 +48,7 @@ public class RiskProcessorComponent {
     private final ReentrantLock buyLock = new ReentrantLock();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> unlockFeature;
-
+    private final Map<String, Double> athDivergencePricesForBoughtSymbols = new ConcurrentHashMap<>();
     @EventListener
     public void onStart(StartupEvent startupEvent) {
         state = stateLoader.loadState();
@@ -61,7 +59,8 @@ public class RiskProcessorComponent {
     @Async
     public void onSignal(CandlestickEvents.SignalEvent signal) {
         lock();
-        if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions()) {
+        athDivergencePricesForBoughtSymbols.put(signal.getSymbol(), signal.getAthDivergencePrice());
+        if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions() && !state.isTurnedOff(signal.getSymbol())) {
             updateBalance();
             BigDecimal usdBalance = state.getUsdQuantity();
             BigDecimal quantity = usdBalance
@@ -94,6 +93,12 @@ public class RiskProcessorComponent {
         }
         CandlestickEvent binanceEvent = candlestickEvent.getBinanceEvent();
         String symbol = binanceEvent.getSymbol();
+        Double athDivergencePrice = athDivergencePricesForBoughtSymbols.get(symbol);
+        if (athDivergencePrice != null && new BigDecimal(binanceEvent.getClose()).doubleValue() > athDivergencePrice) {
+            LOG.info("turn on symbol {}", symbol);
+            robotStateService.turnOnSymbol(symbol);
+            state.turnOn(symbol);
+        }
         state.getOpenPosition(symbol)
                 .ifPresent(openPosition -> {
                     BigDecimal closePrice = new BigDecimal(binanceEvent.getClose());
@@ -121,7 +126,7 @@ public class RiskProcessorComponent {
                                         OrderSide.SELL,
                                         symbol,
                                         openPosition.getBalance()
-                                )));
+                                )), closePrice.doubleValue());
                             }
                         }
                     }
@@ -134,7 +139,7 @@ public class RiskProcessorComponent {
                                     OrderSide.SELL,
                                     symbol,
                                     openPosition.getBalance()
-                            )));
+                            )), closePrice.doubleValue());
 
                         }
                     }
@@ -151,12 +156,17 @@ public class RiskProcessorComponent {
         eventPublisher.publishEventAsync(buyEvent);
     }
 
-    private void onSell(RobotEvents.SellEvent sellEvent) {
+    private void onSell(RobotEvents.SellEvent sellEvent, double currentPrice) {
         updateBalance();
         infoProvider.clearOpenPositionInfo();
         state.addSell(sellEvent);
         robotStateService.saveOpenPositions(robotConfig.getRobotName(), state.openPositions());
         robotStateService.saveCurrencyBalance(state.getUsdCoin(), state.getUsdQuantity());
+        Double athDivergencePrice = athDivergencePricesForBoughtSymbols.get(sellEvent.getSymbol());
+        if (athDivergencePrice != null && currentPrice < athDivergencePrice) {
+            robotStateService.turnOffSymbol(sellEvent.getSymbol());
+            state.turnOff(sellEvent.getSymbol());
+        }
         unlockFeature.cancel(true);
         buyLock.unlock();
         eventPublisher.publishEventAsync(sellEvent);

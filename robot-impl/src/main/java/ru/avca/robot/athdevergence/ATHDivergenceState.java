@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -25,6 +26,7 @@ public class ATHDivergenceState {
     @Getter private volatile BigDecimal usdQuantity;
     private Map<String, AthDivergenceOrder> orders;
     private Map<String, OpenPositionInfo> balances;
+    private Set<String> turnedOffSymbols;
 
 
     public Stream<AthDivergenceOrder> orders() {
@@ -76,6 +78,18 @@ public class ATHDivergenceState {
 
     public synchronized void setUsdQuantity(BigDecimal usdQuantity) {
         this.usdQuantity = usdQuantity;
+    }
+
+    public void turnOn(String symbol) {
+        this.turnedOffSymbols.remove(symbol);
+    }
+
+    public void turnOff(String symbol) {
+        this.turnedOffSymbols.add(symbol);
+    }
+
+    public boolean isTurnedOff(String symbol) {
+        return this.turnedOffSymbols.contains(symbol);
     }
 
     @Value
