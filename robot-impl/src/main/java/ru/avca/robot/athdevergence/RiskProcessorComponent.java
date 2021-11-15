@@ -94,7 +94,7 @@ public class RiskProcessorComponent {
         CandlestickEvent binanceEvent = candlestickEvent.getBinanceEvent();
         String symbol = binanceEvent.getSymbol();
         Double athDivergencePrice = athDivergencePricesForBoughtSymbols.get(symbol);
-        if (athDivergencePrice != null && new BigDecimal(binanceEvent.getClose()).doubleValue() > athDivergencePrice) {
+        if (athDivergencePrice != null && state.isTurnedOff(symbol) && new BigDecimal(binanceEvent.getClose()).doubleValue() > athDivergencePrice) {
             LOG.info("turn on symbol {}", symbol);
             robotStateService.turnOnSymbol(symbol);
             state.turnOn(symbol);
