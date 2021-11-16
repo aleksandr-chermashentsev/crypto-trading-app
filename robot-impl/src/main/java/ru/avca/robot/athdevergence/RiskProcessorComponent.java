@@ -60,7 +60,7 @@ public class RiskProcessorComponent {
     public void onSignal(CandlestickEvents.SignalEvent signal) {
         lock();
         athDivergencePricesForBoughtSymbols.put(signal.getSymbol(), signal.getAthDivergencePrice());
-        if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions() && !state.isTurnedOff(signal.getSymbol())) {
+        if (state != null && state.openPositionsCount() < config.getMaxNumberOfOpenPositions() && state.isTurnedOff(signal.getSymbol())) {
             updateBalance();
             BigDecimal usdBalance = state.getUsdQuantity();
             BigDecimal quantity = usdBalance
