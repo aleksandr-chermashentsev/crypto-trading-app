@@ -9,7 +9,7 @@
         <Logger name="ru.avca.robot.athdevergence" level="trace" additivity="false">
             <AppenderRef ref="LogToConsole"/>
         </Logger>
-        <Root level="error">
+        <Root level="info">
             <AppenderRef ref="LogToConsole"/>
         </Root>
     </Loggers>
